@@ -10,6 +10,48 @@ Purpose here is not to provide a full feature mapping from both libs.
 npm i --save @frenchex/config-lib
 ```
 
+# Usage
+
+## Basic JSON file structure 
+
+```typescript
+export interface ConfigurationDeclarationInterface {
+    imports?: Array<string>
+    ns?: string
+    $: object
+}
+```
+
+Example :
+```
+{
+  "imports": ["config_%env%.json"],
+  "ns": "example",
+  "$": {
+    "foo": {
+      "bar": "foobar",
+      "foobar": "%foo.bar%%foo.bar%"
+    }
+  }
+}
+
+```
+
+## Loading from File
+
+```typescript
+const loader = new ConfigurationLoader({});
+
+const config: ConfigurationInterface = await loader.fromFile({
+    file: path.normalize(path.join(__dirname, '..', '..', 'test-res', 'js.js')),
+    root: path.normalize(path.join(__dirname, '..', '..', 'test-res')),
+    env: {env: 'dev'}
+});
+
+const foobar : string = await config.get<string>('foo.bar');
+```
+
+
 # Usages examples (from tests)
 
 ## Usage 1
