@@ -41,8 +41,8 @@ var Configuration_1 = require("./Configuration");
 var path = require('path');
 var ConfigurationLoader = /** @class */ (function () {
     function ConfigurationLoader(args) {
-        this.$ = args.$ || {};
-        this.configuration = args.configuration || new Configuration_1.Configuration({});
+        this.$ = args && args.$ || {};
+        this.configuration = args && args.configuration || new Configuration_1.Configuration({});
     }
     ConfigurationLoader.prototype.fromFile = function (args) {
         return __awaiter(this, void 0, void 0, function () {

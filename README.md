@@ -1,3 +1,53 @@
+# About
+
+Configuration Library is inspired by ```service-container2``` and ```Symfony Dependency Injection Container```
+
+Purpose here is not to provide a full feature mapping from both libs.
+
+# Installation
+
+```bash
+npm i --save @frenchex/config-lib
+```
+
+# Usages examples (from tests)
+
+## Usage 1
+```typescript
+import "mocha";
+import {Configuration} from "../src/Configuration";
+import {expect} from 'chai';
+
+describe('Configuration', function () {
+    it('can be instantiated', async function (done) {
+        const c = new Configuration({
+            $: {
+                foo: {
+                    bar: 'foobar',
+                    foobar: '%foo.bar%%foo.bar%'
+                }
+            }
+        });
+
+        const foobar = await c.get<string>('foo.bar');
+        const foobar2 = await c.get<string>('foo.foobar');
+        const foo = await c.get<object>('foo');
+
+        expect(foobar).to.be.equal('foobar');
+        expect(foobar2).to.be.equal('foobarfoobar');
+        expect(foo).to.be.deep.equal({bar: 'foobar', foobar: 'foobarfoobar'});
+
+        this.test.callback();
+    })
+})
+
+
+```
+
+## Usage 2
+
+```typescript
+
 import "mocha";
 import {expect} from "chai"
 import {ConfigurationLoader} from "../src";
@@ -27,3 +77,4 @@ describe('ConfigurationLoader', function () {
         this.test.callback();
     })
 })
+```

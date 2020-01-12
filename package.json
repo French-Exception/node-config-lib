@@ -1,13 +1,21 @@
 {
   "name": "@frenchex/config-lib",
   "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
+  "description": "Flexible Configuration Library based on .json or .js files",
+  "main": "src/src/index.js",
+  "types": "src/src/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -r ts-node/register -r source-map-support/register src/test/**/*.js",
+    "build": "tsc",
+    "dev": "tsc -w",
+    "cover": "nyc mocha -r ts-node/register -r source-map-support/register src/test/**/*.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "configuration",
+    "lib",
+    "ts"
+  ],
+  "author": "Stéphane Erard <serard06@protonmail.com>",
   "license": "ISC",
   "devDependencies": {
     "@types/chai": "^4.2.7",
@@ -18,6 +26,8 @@
     "chai": "^4.2.0",
     "mocha": "^7.0.0",
     "mocha-typescript": "^1.1.17",
+    "nodemon": "^2.0.2",
+    "nyc": "^15.0.0",
     "ts-node": "^8.6.1",
     "typescript": "^3.7.4"
   },

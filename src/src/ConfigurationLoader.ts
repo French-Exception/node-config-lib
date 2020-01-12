@@ -23,8 +23,8 @@ export class ConfigurationLoader {
     readonly configuration: ConfigurationInterface;
 
     constructor(args?: ConfigurationLoaderConstructorArguments) {
-        this.$ = args.$ || {};
-        this.configuration = args.configuration || new Configuration({});
+        this.$ = args && args.$ || {};
+        this.configuration = args && args.configuration || new Configuration({});
     }
 
     public async fromFile(args: ConfigurationLoaderFromFileRequest): Promise<ConfigurationInterface> {
