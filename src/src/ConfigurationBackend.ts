@@ -1,5 +1,4 @@
 import {ConfigurationBackendInterface} from "./ConfigurationBackendInterface";
-import * as _ from "underscore";
 import * as merge from "deepmerge";
 
 export class ConfigurationBackend implements ConfigurationBackendInterface {
@@ -26,7 +25,7 @@ export class ConfigurationBackend implements ConfigurationBackendInterface {
     async get<T>(key: string | Array<string>): Promise<T | undefined> {
         if (null == key || undefined === key) throw new Error('Key cannot be empty');
 
-        const _key: Array<string> = _.isArray(key) ? <Array<string>>key : (<string>key).split('.');
+        const _key: Array<string> = Array.isArray(key) ? <Array<string>>key : (<string>key).split('.');
         const _value: T = _getProperty(this.real_object, _key);
         return _value;
     }
@@ -34,7 +33,7 @@ export class ConfigurationBackend implements ConfigurationBackendInterface {
     async set<T>(key: string | Array<string>, value: T): Promise<ConfigurationBackendInterface> {
         if (null === key || undefined === key) throw new Error('Key cannot be empty');
 
-        _setProperty(this.real_object, _.isArray(key) ? <Array<string>>key : (<string>key).split('.'), value);
+        _setProperty(this.real_object, Array.isArray(key) ? <Array<string>>key : (<string>key).split('.'), value);
 
         return this;
     }

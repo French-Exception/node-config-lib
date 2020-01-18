@@ -36,7 +36,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var _ = require("underscore");
 var merge = require("deepmerge");
 var ConfigurationBackend = /** @class */ (function () {
     function ConfigurationBackend(baseObject) {
@@ -65,7 +64,7 @@ var ConfigurationBackend = /** @class */ (function () {
             return __generator(this, function (_a) {
                 if (null == key || undefined === key)
                     throw new Error('Key cannot be empty');
-                _key = _.isArray(key) ? key : key.split('.');
+                _key = Array.isArray(key) ? key : key.split('.');
                 _value = _getProperty(this.real_object, _key);
                 return [2 /*return*/, _value];
             });
@@ -76,7 +75,7 @@ var ConfigurationBackend = /** @class */ (function () {
             return __generator(this, function (_a) {
                 if (null === key || undefined === key)
                     throw new Error('Key cannot be empty');
-                _setProperty(this.real_object, _.isArray(key) ? key : key.split('.'), value);
+                _setProperty(this.real_object, Array.isArray(key) ? key : key.split('.'), value);
                 return [2 /*return*/, this];
             });
         });
