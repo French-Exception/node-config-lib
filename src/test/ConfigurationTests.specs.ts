@@ -21,12 +21,16 @@ describe('Configuration', function () {
         expect(foobar2).to.be.equal('foobarfoobar');
         expect(foo).to.be.deep.equal({bar: 'foobar', foobar: 'foobarfoobar'});
 
+
+        this.test.callback();
+    })
+
+    it('can set and get', async function () {
+        const c = new Configuration();
         await c.set('foo.foo.bar', {foo: 'bar'});
 
         const foofoobar = await c.get<object>('foo.foo.bar', 'not found');
 
         expect(foofoobar).to.be.deep.equal({foo: 'bar'})
-
-        this.test.callback();
     })
 })

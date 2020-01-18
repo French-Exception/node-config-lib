@@ -43,45 +43,42 @@ var path = require("path");
 describe('ConfigurationLoader', function () {
     it('can be loaded', function (done) {
         return __awaiter(this, void 0, void 0, function () {
-            var loader, request, config, foobar, foobar2, foo, promise;
+            var config, foobar, foobar2, foo, promise;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        loader = new src_1.ConfigurationLoader();
-                        return [4 /*yield*/, (function () { return __awaiter(_this, void 0, void 0, function () {
-                                var requestBuilder, request;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0:
-                                            requestBuilder = new src_1.ConfigurationLoaderFromFileRequestBuilder();
-                                            requestBuilder
-                                                .withFile(path.normalize(path.join(__dirname, '..', '..', 'test-res', 'js.js')))
-                                                .withRoot(path.normalize(path.join(__dirname, '..', '..', 'test-res')))
-                                                .withEnv({ env: 'dev' });
-                                            return [4 /*yield*/, requestBuilder.build()];
-                                        case 1:
-                                            request = _a.sent();
-                                            return [2 /*return*/, request];
-                                    }
-                                });
-                            }); })()];
+                    case 0: return [4 /*yield*/, (function () { return __awaiter(_this, void 0, void 0, function () {
+                            var loader, requestBuilder, request;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        loader = new src_1.ConfigurationLoader();
+                                        requestBuilder = new src_1.ConfigurationLoaderFromFileRequestBuilder();
+                                        requestBuilder
+                                            .withFile(path.normalize(path.join(__dirname, '..', '..', 'test-res', 'js.js')))
+                                            .withRoot(path.normalize(path.join(__dirname, '..', '..', 'test-res')))
+                                            .withEnv({ env: 'dev' });
+                                        return [4 /*yield*/, requestBuilder.build()];
+                                    case 1:
+                                        request = _a.sent();
+                                        return [4 /*yield*/, loader.fromFile(request)];
+                                    case 2: return [2 /*return*/, _a.sent()];
+                                }
+                            });
+                        }); })()];
                     case 1:
-                        request = _a.sent();
-                        return [4 /*yield*/, loader.fromFile(request)];
-                    case 2:
                         config = _a.sent();
                         return [4 /*yield*/, config.get('foo.bar')];
-                    case 3:
+                    case 2:
                         foobar = _a.sent();
                         return [4 /*yield*/, config.get('foo.foobar')];
-                    case 4:
+                    case 3:
                         foobar2 = _a.sent();
                         return [4 /*yield*/, config.get('foo')];
-                    case 5:
+                    case 4:
                         foo = _a.sent();
                         return [4 /*yield*/, config.get('promise')];
-                    case 6:
+                    case 5:
                         promise = _a.sent();
                         chai_1.expect(foobar).to.be.equal('foobar');
                         chai_1.expect(foobar2).to.be.equal('foobarfoobar');
