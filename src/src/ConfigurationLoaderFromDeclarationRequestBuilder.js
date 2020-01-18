@@ -36,46 +36,43 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-require("mocha");
-var chai_1 = require("chai");
-var src_1 = require("../src");
-var path = require("path");
-describe('ConfigurationLoader', function () {
-    it('can be loaded', function (done) {
+var ConfigurationLoaderFromDeclarationRequestBuilder = /** @class */ (function () {
+    function ConfigurationLoaderFromDeclarationRequestBuilder() {
+    }
+    ConfigurationLoaderFromDeclarationRequestBuilder.prototype.withRoot = function (root) {
+        this.root = root;
+        return this;
+    };
+    ConfigurationLoaderFromDeclarationRequestBuilder.prototype.withEnv = function (env) {
+        this.env = env;
+        return this;
+    };
+    ConfigurationLoaderFromDeclarationRequestBuilder.prototype.with$ = function ($) {
+        this.$ = $;
+        return this;
+    };
+    ConfigurationLoaderFromDeclarationRequestBuilder.prototype.withConfiguration = function (c) {
+        this.configuration = c;
+        return this;
+    };
+    ConfigurationLoaderFromDeclarationRequestBuilder.prototype.withDeclaration = function (d) {
+        this.declaration = d;
+        return this;
+    };
+    ConfigurationLoaderFromDeclarationRequestBuilder.prototype.build = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var loader, config, foobar, foobar2, foo, promise;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        loader = new src_1.ConfigurationLoader({});
-                        return [4 /*yield*/, loader.fromFile({
-                                file: path.normalize(path.join(__dirname, '..', '..', 'test-res', 'js.js')),
-                                root: path.normalize(path.join(__dirname, '..', '..', 'test-res')),
-                                env: { env: 'dev' }
-                            })];
-                    case 1:
-                        config = _a.sent();
-                        return [4 /*yield*/, config.get('foo.bar')];
-                    case 2:
-                        foobar = _a.sent();
-                        return [4 /*yield*/, config.get('foo.foobar')];
-                    case 3:
-                        foobar2 = _a.sent();
-                        return [4 /*yield*/, config.get('foo')];
-                    case 4:
-                        foo = _a.sent();
-                        return [4 /*yield*/, config.get('promise')];
-                    case 5:
-                        promise = _a.sent();
-                        chai_1.expect(foobar).to.be.equal('foobar');
-                        chai_1.expect(foobar2).to.be.equal('foobarfoobar');
-                        chai_1.expect(foo).to.be.deep.equal({ bar: 'foobar', foobar: 'foobarfoobar' });
-                        chai_1.expect(promise).to.be.deep.equal('resolved');
-                        this.test.callback();
-                        return [2 /*return*/];
-                }
+                return [2 /*return*/, {
+                        root: this.root,
+                        env: this.env,
+                        declaration: this.declaration,
+                        $: this.$,
+                        configuration: this.configuration
+                    }];
             });
         });
-    });
-});
-//# sourceMappingURL=ConfigurationLoaderTests.js.map
+    };
+    return ConfigurationLoaderFromDeclarationRequestBuilder;
+}());
+exports.ConfigurationLoaderFromDeclarationRequestBuilder = ConfigurationLoaderFromDeclarationRequestBuilder;
+//# sourceMappingURL=ConfigurationLoaderFromDeclarationRequestBuilder.js.map

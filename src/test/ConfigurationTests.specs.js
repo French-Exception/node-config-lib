@@ -42,7 +42,7 @@ var chai_1 = require("chai");
 describe('Configuration', function () {
     it('can be instantiated', function (done) {
         return __awaiter(this, void 0, void 0, function () {
-            var c, foobar, foobar2, foo;
+            var c, foobar, foobar2, foo, foofoobar;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -66,6 +66,13 @@ describe('Configuration', function () {
                         chai_1.expect(foobar).to.be.equal('foobar');
                         chai_1.expect(foobar2).to.be.equal('foobarfoobar');
                         chai_1.expect(foo).to.be.deep.equal({ bar: 'foobar', foobar: 'foobarfoobar' });
+                        return [4 /*yield*/, c.set('foo.foo.bar', { foo: 'bar' })];
+                    case 4:
+                        _a.sent();
+                        return [4 /*yield*/, c.get('foo.foo.bar', 'not found')];
+                    case 5:
+                        foofoobar = _a.sent();
+                        chai_1.expect(foofoobar).to.be.deep.equal({ foo: 'bar' });
                         this.test.callback();
                         return [2 /*return*/];
                 }
@@ -73,4 +80,4 @@ describe('Configuration', function () {
         });
     });
 });
-//# sourceMappingURL=ConfigurationTests.js.map
+//# sourceMappingURL=ConfigurationTests.specs.js.map

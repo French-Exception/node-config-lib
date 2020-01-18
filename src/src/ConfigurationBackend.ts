@@ -62,7 +62,7 @@ export function _getProperty(target: object, path: Array<any>) {
     } else {
         return _getProperty(target[current], path);
     }
-};
+}
 
 function _setProperty<T>(target: object, path: Array<any>, value: T) {
     if (path.length == 0) {
@@ -88,12 +88,12 @@ function _setProperty<T>(target: object, path: Array<any>, value: T) {
         target[current] = _setProperty(target[current] || {}, path, value);
         return target;
     }
-};
+}
 
 function _isBuiltinType(target: any) {
     const t: string = typeof (target);
     return t == "string" || t == "number" || t == "date" || t == "boolean"
-};
+}
 
 function _enumerate(collection, target, path) {
     if (target instanceof Array) {
@@ -109,4 +109,4 @@ function _enumerate(collection, target, path) {
             }
         }
     }
-};
+}

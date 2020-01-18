@@ -2,66 +2,77 @@ import {ConfigurationInterface} from "./ConfigurationInterface";
 import * as fs from "fs-extra";
 import {ConfigurationDeclarationInterface} from "./ConfigurationDeclarationInterface";
 import {Configuration} from "./Configuration";
+import {EventEmitter} from "events";
+import {ConfigurationLoaderFromDeclarationRequestInterface} from "./ConfigurationLoaderFromDeclarationRequestInterface"
+import {ConfigurationLoaderFromFileRequestInterface} from "./ConfigurationLoaderFromFileRequestInterface"
 
 const path = require('path');
 
-export interface ConfigurationLoaderConstructorArguments {
-    $?: object
-    configuration?: ConfigurationInterface
-}
+export class ConfigurationLoader extends EventEmitter {
 
-export interface ConfigurationLoaderFromFileRequest {
-    file: string
-    root: string
-    $?: object;
-    configuration?: ConfigurationInterface;
-    env?: object;
-}
+    public async fromDeclaration(args: ConfigurationLoaderFromDeclarationRequestInterface): Promise<ConfigurationInterface> {
+        const c = args.configuration = args.configuration || new Configuration({$: args.$, env: args.env});
 
-export class ConfigurationLoader {
-    readonly $: object;
-    readonly configuration: ConfigurationInterface;
+        this.emit('fromDeclaration.start', args);
 
-    constructor(args?: ConfigurationLoaderConstructorArguments) {
-        this.$ = args && args.$ || {};
-        this.configuration = args && args.configuration || new Configuration({});
-    }
+        await this.imports(args.declaration.imports, args.configuration, args.root);
 
-    public async fromFile(args: ConfigurationLoaderFromFileRequest): Promise<ConfigurationInterface> {
-        if (!args.env) args.env = {};
-        if (!args.file) throw new Error('missing file');
-        if (!path.isAbsolute(args.file) && !args.root) throw new Error('missing absolute file or root');
-
-        const d = await this.loadJsonDeclaration(args.file);
-
-        const c = args.configuration || new Configuration(args.$ || {});
-
-        await c.merge(args.env);
-
-        if (d.imports && d.imports.length && d.imports.length > 0) {
-
-            for (let key in d.imports) {
-                const givenFile = (() => {
-                    if (path.isAbsolute(d.imports[key]))
-                        return d.imports[key];
-                    return path.normalize(path.join(args.root, d.imports[key]));
-                })();
-
-                const interpolatedGivenFile = await c.interpolateString<string>(givenFile);
-                const normalizedFile = path.normalize(interpolatedGivenFile);
-
-                const importedDeclaration: ConfigurationDeclarationInterface =
-                    await this.loadJsonDeclaration(normalizedFile);
-
-                await c.merge(importedDeclaration.$);
-            }
-        }
+        this.emit('fromDeclaration.stop', args);
 
         return c;
     }
 
-    protected async loadJsonDeclarationFromFilesystem(absoluteFilepath: string) {
-        return JSON.parse(await fs.readFile(absoluteFilepath).toString());
+    public async fromFile(args: ConfigurationLoaderFromFileRequestInterface): Promise<ConfigurationInterface> {
+        if (!args.env) args.env = {};
+        if (!args.file && !args.declaration) throw new Error('missing file and no declaration');
+        if (!args.root) args.root = path.dirname(args.file);
+        if (!path.isAbsolute(args.file) && !args.root) throw new Error('missing absolute file or root');
+
+        args.configuration = args.configuration || new Configuration({env: args.env, $: args.$});
+
+        const d = await this.loadJsonDeclaration(args.file);
+
+        return await this.fromDeclaration({
+            declaration: d,
+            $: args.$,
+            configuration: args.configuration,
+            env: args.env,
+            root: args.root
+        })
+    }
+
+    protected async imports(imports: Array<string>, configuration: ConfigurationInterface, root: string): Promise<ConfigurationInterface> {
+        if (imports && imports.length && imports.length > 0) {
+
+            for (let key in imports) {
+                const givenFile = (() => {
+                    if (path.isAbsolute(imports[key]))
+                        return imports[key];
+                    return path.normalize(path.join(root, imports[key]));
+                })();
+
+                const interpolatedGivenFile = await configuration.interpolateString<string>(givenFile);
+                const normalizedFile = path.normalize(<string>interpolatedGivenFile);
+
+
+                const importedDeclaration: ConfigurationDeclarationInterface =
+                    await this.loadJsonDeclaration(normalizedFile);
+
+                this.emit('fromDeclaration.import', {
+                    given: givenFile,
+                    interpolated: interpolatedGivenFile,
+                    normal: normalizedFile,
+                    importedDeclaration: importedDeclaration
+                });
+
+                await configuration.merge(importedDeclaration.$);
+
+                if (importedDeclaration.imports)
+                    await this.imports(importedDeclaration.imports, configuration, root);
+            }
+        }
+
+        return configuration;
     }
 
     protected async loadJsonDeclaration(file: string): Promise<ConfigurationDeclarationInterface> {

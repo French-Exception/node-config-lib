@@ -49,18 +49,16 @@ var __values = (this && this.__values) || function(o) {
 exports.__esModule = true;
 var _ = require("underscore");
 var ConfigurationBackend_1 = require("./ConfigurationBackend");
+var merge = require("deepmerge");
+var Maybe = require("maybe.ts");
 var object_walker = require('object-walker');
 var Configuration = /** @class */ (function () {
     function Configuration(args) {
         this.args = args || {};
-        if (!args || !args.keyRegex)
-            this.args.keyRegex = new RegExp('%[^%]+?%', 'g');
-        if (!args || !args.env)
-            this.args.env = {};
-        if (!args || !args.$)
-            this.args.$ = {};
-        if (!args || !args.backend)
-            this.args.backend = new ConfigurationBackend_1.ConfigurationBackend(this.args.$);
+        this.args.keyRegex = (!args || !args.keyRegex) ? new RegExp('%[^%]+?%', 'g') : args.keyRegex;
+        this.args.env = (!args || !args.env) ? {} : args.env;
+        this.args.$ = (!args || !args.$) ? this.args.env : merge(this.args.$, this.args.env);
+        this.args.backend = (!args || !args.backend) ? new ConfigurationBackend_1.ConfigurationBackend(this.args.$) : args.backend;
     }
     Configuration.prototype.merge = function (source) {
         return __awaiter(this, void 0, void 0, function () {
@@ -76,7 +74,7 @@ var Configuration = /** @class */ (function () {
     };
     Configuration.prototype.get = function (interpolableKey, defaultIfUndef) {
         return __awaiter(this, void 0, void 0, function () {
-            var _interpolatedKey, _rawValue, _interpolatedValue;
+            var _interpolatedKey, _rawValue, _interpolatedValue, _return;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -91,7 +89,8 @@ var Configuration = /** @class */ (function () {
                         return [4 /*yield*/, this.interpolateValue(_rawValue)];
                     case 3:
                         _interpolatedValue = _a.sent();
-                        return [2 /*return*/, _interpolatedValue ? _interpolatedValue : defaultIfUndef];
+                        _return = Maybe.or(_interpolatedValue, defaultIfUndef);
+                        return [2 /*return*/, _return];
                 }
             });
         });
@@ -181,20 +180,19 @@ var Configuration = /** @class */ (function () {
                         return [4 /*yield*/, this.isStringInterpolable(interpolableString)];
                     case 1:
                         isStringInterpolable = _a.sent();
-                        if (!(true === isStringInterpolable)) return [3 /*break*/, 3];
+                        if (!(true === isStringInterpolable)) return [3 /*break*/, 7];
                         return [4 /*yield*/, this._interpolateString(interpolableString)];
                     case 2:
                         _first = _a.sent();
-                        // check for interpolated keys returning interpolable keys like %%my.value%%
-                        // and again for %%%my.value%%% returning %%my.value1%% and again for %my.value2%
-                        if (_.isString(_first) && this.isStringInterpolable(_first)) {
-                            return [2 /*return*/, this.interpolateString(_first)];
-                        }
-                        else if (_.isObject(_first)) {
-                            return [2 /*return*/, this.interpolateObject(_first)];
-                        }
-                        return [2 /*return*/, _first];
-                    case 3: return [2 /*return*/, interpolableString];
+                        if (!(_.isString(_first) && this.isStringInterpolable(_first))) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.interpolateString(_first)];
+                    case 3: return [2 /*return*/, _a.sent()];
+                    case 4:
+                        if (!_.isObject(_first)) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this.interpolateObject(_first)];
+                    case 5: return [2 /*return*/, _a.sent()];
+                    case 6: return [2 /*return*/, Maybe.just(_first)];
+                    case 7: return [2 /*return*/, interpolableString];
                 }
             });
         });

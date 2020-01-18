@@ -1,4 +1,6 @@
 {
+  "imports": [],
+  "ns": "",
   "$": {
     "foo": {
       "bar": "foobar",

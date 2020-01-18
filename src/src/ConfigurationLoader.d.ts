@@ -1,21 +1,12 @@
+/// <reference types="node" />
 import { ConfigurationInterface } from "./ConfigurationInterface";
 import { ConfigurationDeclarationInterface } from "./ConfigurationDeclarationInterface";
-export interface ConfigurationLoaderConstructorArguments {
-    $?: object;
-    configuration?: ConfigurationInterface;
-}
-export interface ConfigurationLoaderFromFileRequest {
-    file: string;
-    root: string;
-    $?: object;
-    configuration?: ConfigurationInterface;
-    env?: object;
-}
-export declare class ConfigurationLoader {
-    readonly $: object;
-    readonly configuration: ConfigurationInterface;
-    constructor(args?: ConfigurationLoaderConstructorArguments);
-    fromFile(args: ConfigurationLoaderFromFileRequest): Promise<ConfigurationInterface>;
-    protected loadJsonDeclarationFromFilesystem(absoluteFilepath: string): Promise<any>;
+import { EventEmitter } from "events";
+import { ConfigurationLoaderFromDeclarationRequestInterface } from "./ConfigurationLoaderFromDeclarationRequestInterface";
+import { ConfigurationLoaderFromFileRequestInterface } from "./ConfigurationLoaderFromFileRequestInterface";
+export declare class ConfigurationLoader extends EventEmitter {
+    fromDeclaration(args: ConfigurationLoaderFromDeclarationRequestInterface): Promise<ConfigurationInterface>;
+    fromFile(args: ConfigurationLoaderFromFileRequestInterface): Promise<ConfigurationInterface>;
+    protected imports(imports: Array<string>, configuration: ConfigurationInterface, root: string): Promise<ConfigurationInterface>;
     protected loadJsonDeclaration(file: string): Promise<ConfigurationDeclarationInterface>;
 }

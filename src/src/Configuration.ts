@@ -2,6 +2,8 @@ import {ConfigurationInterface} from "./ConfigurationInterface";
 import * as _ from "underscore";
 import {ConfigurationBackendInterface} from "./ConfigurationBackendInterface";
 import {ConfigurationBackend} from "./ConfigurationBackend";
+import * as merge from "deepmerge";
+import * as Maybe from "maybe.ts"
 
 const object_walker = require('object-walker');
 
@@ -18,41 +20,32 @@ export class Configuration implements ConfigurationInterface {
 
     constructor(args?: ConfigurationConstructionArguments) {
         this.args = args || {};
-
-        if (!args || !args.keyRegex)
-            this.args.keyRegex = new RegExp('%[^%]+?%', 'g');
-
-        if (!args || !args.env)
-            this.args.env = {};
-
-        if (!args || !args.$)
-            this.args.$ = {};
-
-        if (!args || !args.backend)
-            this.args.backend = new ConfigurationBackend(this.args.$);
+        this.args.keyRegex = (!args || !args.keyRegex) ? new RegExp('%[^%]+?%', 'g') : args.keyRegex;
+        this.args.env = (!args || !args.env) ? {} : args.env;
+        this.args.$ = (!args || !args.$) ? this.args.env : merge(this.args.$, this.args.env);
+        this.args.backend = (!args || !args.backend) ? new ConfigurationBackend(this.args.$) : args.backend;
     }
 
     public async merge(source: object): Promise<ConfigurationInterface> {
-
         await this.args.backend.merge(source);
-
         return <ConfigurationInterface>this;
     }
 
-    public async get<T>(interpolableKey: string, defaultIfUndef?: any): Promise<T> {
+    public async get<T>(interpolableKey: string, defaultIfUndef?: any): Promise<Maybe.Maybe<T>> {
         if (undefined === interpolableKey || null === interpolableKey) throw new Error('Key cannot be empty');
 
         const _interpolatedKey = await this.interpolateString<string>(interpolableKey);
-        const _rawValue: T = await this._get<T>(_interpolatedKey);
+        const _rawValue: T = await this._get<T>(<string>_interpolatedKey);
         const _interpolatedValue: T = await this.interpolateValue<T>((<any>_rawValue));
-        return _interpolatedValue ? _interpolatedValue : defaultIfUndef;
+
+        const _return = Maybe.or<T>(_interpolatedValue, defaultIfUndef);
+
+        return _return;
     }
 
     public async getRaw<T>(interpolatedKey: string): Promise<T> {
         if (undefined === interpolatedKey || null === interpolatedKey) throw new Error('Key cannot be empty');
-
         const _value: T = await this.args.backend.get<T>(interpolatedKey);
-
         return _value;
     }
 
@@ -69,15 +62,15 @@ export class Configuration implements ConfigurationInterface {
         if (undefined === interpolableKey || null === interpolableKey || "" === interpolableKey)
             throw new Error('Key cannot be empty');
 
-        const _interpolatedKey = await this.interpolateString<string>(interpolableKey);
-        await this.args.backend.set(_interpolatedKey.split('.'), value);
+        const _interpolatedKey: Maybe.Maybe<string> = await this.interpolateString<string>(interpolableKey);
+        await this.args.backend.set((<string>_interpolatedKey).split('.'), value);
 
         return <ConfigurationInterface>this;
     }
 
     public async interpolateValue<T>(_rawValue: string | Array<any> | object): Promise<T> {
         if (_.isString(_rawValue)) {
-            const _interpolatedValue = await this.interpolateString(<string><unknown>_rawValue)
+            const _interpolatedValue = await this.interpolateString(<string><unknown>_rawValue);
             return <any>_interpolatedValue;
         } else if (_.isArray(_rawValue) || _.isObject(_rawValue)) {
             const _interpolatedValue: T = await this.interpolateObject<T>((<any>_rawValue));
@@ -85,22 +78,22 @@ export class Configuration implements ConfigurationInterface {
         }
     }
 
-    public async interpolateString<T>(interpolableString: string): Promise<T> {
+    public async interpolateString<T>(interpolableString: string): Promise<Maybe.Maybe<T>> {
         if (undefined === interpolableString || null === interpolableString) throw new Error('Key cannot be empty');
 
         const isStringInterpolable = await this.isStringInterpolable(interpolableString);
         if (true === isStringInterpolable) {
-            const _first = await this._interpolateString<string>(interpolableString);
+            const _first: string | object = await this._interpolateString<string>(interpolableString);
             // check for interpolated keys returning interpolable keys like %%my.value%%
             // and again for %%%my.value%%% returning %%my.value1%% and again for %my.value2%
             if (_.isString(_first) && this.isStringInterpolable(_first)) {
-                return this.interpolateString(_first);
+                return await this.interpolateString(_first);
             } else if (_.isObject(_first)) {
-                return this.interpolateObject<any>((<any>_first));
+                return await this.interpolateObject<any>((<any>_first));
             }
-            return <any>_first;
+            return Maybe.just<T>(<any>_first);
         }
-        return <any>interpolableString;
+        return (<any>interpolableString);
     }
 
     public async isStringInterpolable(string: string): Promise<boolean> {

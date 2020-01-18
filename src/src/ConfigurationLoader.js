@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -38,86 +51,119 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var fs = require("fs-extra");
 var Configuration_1 = require("./Configuration");
+var events_1 = require("events");
 var path = require('path');
-var ConfigurationLoader = /** @class */ (function () {
-    function ConfigurationLoader(args) {
-        this.$ = args && args.$ || {};
-        this.configuration = args && args.configuration || new Configuration_1.Configuration({});
+var ConfigurationLoader = /** @class */ (function (_super) {
+    __extends(ConfigurationLoader, _super);
+    function ConfigurationLoader() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
+    ConfigurationLoader.prototype.fromDeclaration = function (args) {
+        return __awaiter(this, void 0, void 0, function () {
+            var c;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        c = args.configuration = args.configuration || new Configuration_1.Configuration({ $: args.$, env: args.env });
+                        this.emit('fromDeclaration.start', args);
+                        return [4 /*yield*/, this.imports(args.declaration.imports, args.configuration, args.root)];
+                    case 1:
+                        _a.sent();
+                        this.emit('fromDeclaration.stop', args);
+                        return [2 /*return*/, c];
+                }
+            });
+        });
+    };
     ConfigurationLoader.prototype.fromFile = function (args) {
         return __awaiter(this, void 0, void 0, function () {
-            var d, c, _loop_1, this_1, _a, _b, _i, key;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            var d;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
                         if (!args.env)
                             args.env = {};
-                        if (!args.file)
-                            throw new Error('missing file');
+                        if (!args.file && !args.declaration)
+                            throw new Error('missing file and no declaration');
+                        if (!args.root)
+                            args.root = path.dirname(args.file);
                         if (!path.isAbsolute(args.file) && !args.root)
                             throw new Error('missing absolute file or root');
+                        args.configuration = args.configuration || new Configuration_1.Configuration({ env: args.env, $: args.$ });
                         return [4 /*yield*/, this.loadJsonDeclaration(args.file)];
                     case 1:
-                        d = _c.sent();
-                        c = args.configuration || new Configuration_1.Configuration(args.$ || {});
-                        return [4 /*yield*/, c.merge(args.env)];
-                    case 2:
-                        _c.sent();
-                        if (!(d.imports && d.imports.length && d.imports.length > 0)) return [3 /*break*/, 6];
+                        d = _a.sent();
+                        return [4 /*yield*/, this.fromDeclaration({
+                                declaration: d,
+                                $: args.$,
+                                configuration: args.configuration,
+                                env: args.env,
+                                root: args.root
+                            })];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    ConfigurationLoader.prototype.imports = function (imports, configuration, root) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _loop_1, this_1, _a, _b, _i, key;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        if (!(imports && imports.length && imports.length > 0)) return [3 /*break*/, 4];
                         _loop_1 = function (key) {
                             var givenFile, interpolatedGivenFile, normalizedFile, importedDeclaration;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
                                         givenFile = (function () {
-                                            if (path.isAbsolute(d.imports[key]))
-                                                return d.imports[key];
-                                            return path.normalize(path.join(args.root, d.imports[key]));
+                                            if (path.isAbsolute(imports[key]))
+                                                return imports[key];
+                                            return path.normalize(path.join(root, imports[key]));
                                         })();
-                                        return [4 /*yield*/, c.interpolateString(givenFile)];
+                                        return [4 /*yield*/, configuration.interpolateString(givenFile)];
                                     case 1:
                                         interpolatedGivenFile = _a.sent();
                                         normalizedFile = path.normalize(interpolatedGivenFile);
                                         return [4 /*yield*/, this_1.loadJsonDeclaration(normalizedFile)];
                                     case 2:
                                         importedDeclaration = _a.sent();
-                                        return [4 /*yield*/, c.merge(importedDeclaration.$)];
+                                        this_1.emit('fromDeclaration.import', {
+                                            given: givenFile,
+                                            interpolated: interpolatedGivenFile,
+                                            normal: normalizedFile,
+                                            importedDeclaration: importedDeclaration
+                                        });
+                                        return [4 /*yield*/, configuration.merge(importedDeclaration.$)];
                                     case 3:
                                         _a.sent();
-                                        return [2 /*return*/];
+                                        if (!importedDeclaration.imports) return [3 /*break*/, 5];
+                                        return [4 /*yield*/, this_1.imports(importedDeclaration.imports, configuration, root)];
+                                    case 4:
+                                        _a.sent();
+                                        _a.label = 5;
+                                    case 5: return [2 /*return*/];
                                 }
                             });
                         };
                         this_1 = this;
                         _a = [];
-                        for (_b in d.imports)
+                        for (_b in imports)
                             _a.push(_b);
                         _i = 0;
-                        _c.label = 3;
-                    case 3:
-                        if (!(_i < _a.length)) return [3 /*break*/, 6];
+                        _c.label = 1;
+                    case 1:
+                        if (!(_i < _a.length)) return [3 /*break*/, 4];
                         key = _a[_i];
                         return [5 /*yield**/, _loop_1(key)];
-                    case 4:
+                    case 2:
                         _c.sent();
-                        _c.label = 5;
-                    case 5:
+                        _c.label = 3;
+                    case 3:
                         _i++;
-                        return [3 /*break*/, 3];
-                    case 6: return [2 /*return*/, c];
-                }
-            });
-        });
-    };
-    ConfigurationLoader.prototype.loadJsonDeclarationFromFilesystem = function (absoluteFilepath) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, _b;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        _b = (_a = JSON).parse;
-                        return [4 /*yield*/, fs.readFile(absoluteFilepath).toString()];
-                    case 1: return [2 /*return*/, _b.apply(_a, [_c.sent()])];
+                        return [3 /*break*/, 1];
+                    case 4: return [2 /*return*/, configuration];
                 }
             });
         });
@@ -169,6 +215,6 @@ var ConfigurationLoader = /** @class */ (function () {
         });
     };
     return ConfigurationLoader;
-}());
+}(events_1.EventEmitter));
 exports.ConfigurationLoader = ConfigurationLoader;
 //# sourceMappingURL=ConfigurationLoader.js.map

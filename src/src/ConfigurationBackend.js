@@ -106,7 +106,6 @@ function _getProperty(target, path) {
     }
 }
 exports._getProperty = _getProperty;
-;
 function _setProperty(target, path, value) {
     if (path.length == 0) {
         return value;
@@ -133,12 +132,10 @@ function _setProperty(target, path, value) {
         return target;
     }
 }
-;
 function _isBuiltinType(target) {
     var t = typeof (target);
     return t == "string" || t == "number" || t == "date" || t == "boolean";
 }
-;
 function _enumerate(collection, target, path) {
     if (target instanceof Array) {
         for (var i = 0; i < target.length; i++) {
@@ -156,5 +153,4 @@ function _enumerate(collection, target, path) {
         }
     }
 }
-;
 //# sourceMappingURL=ConfigurationBackend.js.map
