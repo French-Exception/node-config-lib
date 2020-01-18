@@ -1,7 +1,7 @@
 import {ConfigurationInterface} from "./ConfigurationInterface";
 import * as fs from "fs-extra";
 import {ConfigurationDeclarationInterface} from "./ConfigurationDeclarationInterface";
-import {Configuration} from "./Configuration";
+import {Configuration, VERSION} from "./Configuration";
 import {EventEmitter} from "events";
 import {ConfigurationLoaderFromDeclarationRequestInterface} from "./ConfigurationLoaderFromDeclarationRequestInterface"
 import {ConfigurationLoaderFromFileRequestInterface} from "./ConfigurationLoaderFromFileRequestInterface"
@@ -56,7 +56,7 @@ export class ConfigurationLoader extends EventEmitter {
 
 
                 const importedDeclaration: ConfigurationDeclarationInterface =
-                    await this.loadJsonDeclaration(normalizedFile);
+                    this.reshapeDeclaration(await this.loadJsonDeclaration(normalizedFile));
 
                 this.emit('fromDeclaration.import', {
                     given: givenFile,
@@ -73,6 +73,15 @@ export class ConfigurationLoader extends EventEmitter {
         }
 
         return configuration;
+    }
+
+    protected reshapeDeclaration(declaration: ConfigurationDeclarationInterface): ConfigurationDeclarationInterface {
+        declaration.imports = declaration.imports || [];
+        declaration.ns = declaration.ns || null;
+        declaration.$ = declaration.$ || {};
+        declaration.version = declaration.version || VERSION
+
+        return
     }
 
     protected async loadJsonDeclaration(file: string): Promise<ConfigurationDeclarationInterface> {

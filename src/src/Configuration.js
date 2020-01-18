@@ -51,6 +51,7 @@ var _ = require("underscore");
 var ConfigurationBackend_1 = require("./ConfigurationBackend");
 var merge = require("deepmerge");
 var Maybe = require("maybe.ts");
+exports.VERSION = '1.0';
 var object_walker = require('object-walker');
 var Configuration = /** @class */ (function () {
     function Configuration(args) {

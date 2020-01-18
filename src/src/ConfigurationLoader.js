@@ -113,9 +113,9 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                     case 0:
                         if (!(imports && imports.length && imports.length > 0)) return [3 /*break*/, 4];
                         _loop_1 = function (key) {
-                            var givenFile, interpolatedGivenFile, normalizedFile, importedDeclaration;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
+                            var givenFile, interpolatedGivenFile, normalizedFile, importedDeclaration, _a, _b;
+                            return __generator(this, function (_c) {
+                                switch (_c.label) {
                                     case 0:
                                         givenFile = (function () {
                                             if (path.isAbsolute(imports[key]))
@@ -124,11 +124,12 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                                         })();
                                         return [4 /*yield*/, configuration.interpolateString(givenFile)];
                                     case 1:
-                                        interpolatedGivenFile = _a.sent();
+                                        interpolatedGivenFile = _c.sent();
                                         normalizedFile = path.normalize(interpolatedGivenFile);
+                                        _b = (_a = this_1).reshapeDeclaration;
                                         return [4 /*yield*/, this_1.loadJsonDeclaration(normalizedFile)];
                                     case 2:
-                                        importedDeclaration = _a.sent();
+                                        importedDeclaration = _b.apply(_a, [_c.sent()]);
                                         this_1.emit('fromDeclaration.import', {
                                             given: givenFile,
                                             interpolated: interpolatedGivenFile,
@@ -137,12 +138,12 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                                         });
                                         return [4 /*yield*/, configuration.merge(importedDeclaration.$)];
                                     case 3:
-                                        _a.sent();
+                                        _c.sent();
                                         if (!importedDeclaration.imports) return [3 /*break*/, 5];
                                         return [4 /*yield*/, this_1.imports(importedDeclaration.imports, configuration, root)];
                                     case 4:
-                                        _a.sent();
-                                        _a.label = 5;
+                                        _c.sent();
+                                        _c.label = 5;
                                     case 5: return [2 /*return*/];
                                 }
                             });
@@ -167,6 +168,13 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                 }
             });
         });
+    };
+    ConfigurationLoader.prototype.reshapeDeclaration = function (declaration) {
+        declaration.imports = declaration.imports || [];
+        declaration.ns = declaration.ns || null;
+        declaration.$ = declaration.$ || {};
+        declaration.version = declaration.version || Configuration_1.VERSION;
+        return;
     };
     ConfigurationLoader.prototype.loadJsonDeclaration = function (file) {
         return __awaiter(this, void 0, void 0, function () {

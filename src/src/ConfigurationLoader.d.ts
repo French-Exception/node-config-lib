@@ -8,5 +8,6 @@ export declare class ConfigurationLoader extends EventEmitter {
     fromDeclaration(args: ConfigurationLoaderFromDeclarationRequestInterface): Promise<ConfigurationInterface>;
     fromFile(args: ConfigurationLoaderFromFileRequestInterface): Promise<ConfigurationInterface>;
     protected imports(imports: Array<string>, configuration: ConfigurationInterface, root: string): Promise<ConfigurationInterface>;
+    protected reshapeDeclaration(declaration: ConfigurationDeclarationInterface): ConfigurationDeclarationInterface;
     protected loadJsonDeclaration(file: string): Promise<ConfigurationDeclarationInterface>;
 }

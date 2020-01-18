@@ -5,6 +5,8 @@ import {ConfigurationBackend} from "./ConfigurationBackend";
 import * as merge from "deepmerge";
 import * as Maybe from "maybe.ts"
 
+export const VERSION:string='1.0'
+
 const object_walker = require('object-walker');
 
 export interface ConfigurationConstructionArguments {

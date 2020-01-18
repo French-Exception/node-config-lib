@@ -1,6 +1,7 @@
 import { ConfigurationInterface } from "./ConfigurationInterface";
 import { ConfigurationBackendInterface } from "./ConfigurationBackendInterface";
 import * as Maybe from "maybe.ts";
+export declare const VERSION: string;
 export interface ConfigurationConstructionArguments {
     env?: object;
     backend?: ConfigurationBackendInterface;
