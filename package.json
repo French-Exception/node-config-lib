@@ -17,6 +17,9 @@
     "ts"
   ],
   "repository": "git@github.com:French-Exception/node-config-lib.git",
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "Stéphane Erard <serard06@protonmail.com>",
   "license": "ISC",
   "devDependencies": {
