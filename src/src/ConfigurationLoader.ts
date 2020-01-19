@@ -12,9 +12,11 @@ export class ConfigurationLoader extends EventEmitter {
 
     public async fromDeclaration(args: ConfigurationLoaderFromDeclarationRequestInterface): Promise<ConfigurationInterface> {
         const c = args.configuration = args.configuration || new Configuration({$: args.$, env: args.env});
-        args.declaration = args.declaration || <any>{};
 
-        await this.reshapeDeclaration(args.declaration);
+        if (args.$)
+            await c.merge(args.$);
+
+        args.declaration = await this.reshapeDeclaration(args.declaration);
 
         this.emit('fromDeclaration.start', args);
 
@@ -57,9 +59,10 @@ export class ConfigurationLoader extends EventEmitter {
                 const interpolatedGivenFile = await configuration.interpolateString<string>(givenFile);
                 const normalizedFile = path.normalize(<string>interpolatedGivenFile);
 
-
                 const importedDeclaration: ConfigurationDeclarationInterface =
-                    await this.reshapeDeclaration(await this.loadJsonDeclaration(normalizedFile));
+                    await this.reshapeDeclaration(
+                        await this.loadJsonDeclaration(normalizedFile)
+                    );
 
                 this.emit('fromDeclaration.import', {
                     given: givenFile,
