@@ -1,6 +1,6 @@
 export interface ConfigurationDeclarationInterface {
     imports?: Array<string>
     ns?: string
-    $: object
+    $?: object
     version?: string
 }
