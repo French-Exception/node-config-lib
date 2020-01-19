@@ -12,6 +12,9 @@ export class ConfigurationLoader extends EventEmitter {
 
     public async fromDeclaration(args: ConfigurationLoaderFromDeclarationRequestInterface): Promise<ConfigurationInterface> {
         const c = args.configuration = args.configuration || new Configuration({$: args.$, env: args.env});
+        args.declaration = args.declaration || <any>{};
+
+        await this.reshapeDeclaration(args.declaration);
 
         this.emit('fromDeclaration.start', args);
 
@@ -56,7 +59,7 @@ export class ConfigurationLoader extends EventEmitter {
 
 
                 const importedDeclaration: ConfigurationDeclarationInterface =
-                    this.reshapeDeclaration(await this.loadJsonDeclaration(normalizedFile));
+                    await this.reshapeDeclaration(await this.loadJsonDeclaration(normalizedFile));
 
                 this.emit('fromDeclaration.import', {
                     given: givenFile,
@@ -65,9 +68,10 @@ export class ConfigurationLoader extends EventEmitter {
                     importedDeclaration: importedDeclaration
                 });
 
-                await configuration.merge(importedDeclaration.$);
+                if (importedDeclaration && importedDeclaration.$)
+                    await configuration.merge(importedDeclaration.$);
 
-                if (importedDeclaration.imports)
+                if (importedDeclaration && importedDeclaration.imports)
                     await this.imports(importedDeclaration.imports, configuration, root);
             }
         }
@@ -75,13 +79,14 @@ export class ConfigurationLoader extends EventEmitter {
         return configuration;
     }
 
-    protected reshapeDeclaration(declaration: ConfigurationDeclarationInterface): ConfigurationDeclarationInterface {
-        declaration.imports = declaration.imports || [];
-        declaration.ns = declaration.ns || null;
-        declaration.$ = declaration.$ || {};
-        declaration.version = declaration.version || VERSION
-
-        return
+    protected async reshapeDeclaration(declaration: ConfigurationDeclarationInterface): Promise<ConfigurationDeclarationInterface> {
+        const d: ConfigurationDeclarationInterface = {
+            imports: (declaration && declaration.imports) || [],
+            ns: (declaration && declaration.ns) || '',
+            $: (declaration && declaration.$) || {},
+            version: (declaration && declaration.version) || VERSION
+        }
+        return d;
     }
 
     protected async loadJsonDeclaration(file: string): Promise<ConfigurationDeclarationInterface> {

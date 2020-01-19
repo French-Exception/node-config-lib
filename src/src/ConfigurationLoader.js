@@ -65,9 +65,13 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                 switch (_a.label) {
                     case 0:
                         c = args.configuration = args.configuration || new Configuration_1.Configuration({ $: args.$, env: args.env });
+                        args.declaration = args.declaration || {};
+                        return [4 /*yield*/, this.reshapeDeclaration(args.declaration)];
+                    case 1:
+                        _a.sent();
                         this.emit('fromDeclaration.start', args);
                         return [4 /*yield*/, this.imports(args.declaration.imports, args.configuration, args.root)];
-                    case 1:
+                    case 2:
                         _a.sent();
                         this.emit('fromDeclaration.stop', args);
                         return [2 /*return*/, c];
@@ -128,23 +132,27 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                                         normalizedFile = path.normalize(interpolatedGivenFile);
                                         _b = (_a = this_1).reshapeDeclaration;
                                         return [4 /*yield*/, this_1.loadJsonDeclaration(normalizedFile)];
-                                    case 2:
-                                        importedDeclaration = _b.apply(_a, [_c.sent()]);
+                                    case 2: return [4 /*yield*/, _b.apply(_a, [_c.sent()])];
+                                    case 3:
+                                        importedDeclaration = _c.sent();
                                         this_1.emit('fromDeclaration.import', {
                                             given: givenFile,
                                             interpolated: interpolatedGivenFile,
                                             normal: normalizedFile,
                                             importedDeclaration: importedDeclaration
                                         });
+                                        if (!(importedDeclaration && importedDeclaration.$)) return [3 /*break*/, 5];
                                         return [4 /*yield*/, configuration.merge(importedDeclaration.$)];
-                                    case 3:
-                                        _c.sent();
-                                        if (!importedDeclaration.imports) return [3 /*break*/, 5];
-                                        return [4 /*yield*/, this_1.imports(importedDeclaration.imports, configuration, root)];
                                     case 4:
                                         _c.sent();
                                         _c.label = 5;
-                                    case 5: return [2 /*return*/];
+                                    case 5:
+                                        if (!(importedDeclaration && importedDeclaration.imports)) return [3 /*break*/, 7];
+                                        return [4 /*yield*/, this_1.imports(importedDeclaration.imports, configuration, root)];
+                                    case 6:
+                                        _c.sent();
+                                        _c.label = 7;
+                                    case 7: return [2 /*return*/];
                                 }
                             });
                         };
@@ -170,11 +178,18 @@ var ConfigurationLoader = /** @class */ (function (_super) {
         });
     };
     ConfigurationLoader.prototype.reshapeDeclaration = function (declaration) {
-        declaration.imports = declaration.imports || [];
-        declaration.ns = declaration.ns || null;
-        declaration.$ = declaration.$ || {};
-        declaration.version = declaration.version || Configuration_1.VERSION;
-        return;
+        return __awaiter(this, void 0, void 0, function () {
+            var d;
+            return __generator(this, function (_a) {
+                d = {
+                    imports: (declaration && declaration.imports) || [],
+                    ns: (declaration && declaration.ns) || '',
+                    $: (declaration && declaration.$) || {},
+                    version: (declaration && declaration.version) || Configuration_1.VERSION
+                };
+                return [2 /*return*/, d];
+            });
+        });
     };
     ConfigurationLoader.prototype.loadJsonDeclaration = function (file) {
         return __awaiter(this, void 0, void 0, function () {

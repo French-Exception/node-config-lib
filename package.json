@@ -1,6 +1,6 @@
 {
   "name": "@frenchex/config-lib",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Flexible Configuration Library based on .json or .js files (raw JSON or promises)",
   "main": "src/src/index.js",
   "types": "src/src/index.d.ts",
