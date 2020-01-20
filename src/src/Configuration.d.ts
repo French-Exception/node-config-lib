@@ -20,6 +20,7 @@ export declare class Configuration implements ConfigurationInterface {
     resetChanges(): void;
     save(toFile: string): Promise<string>;
     getObject<T>(): Promise<T>;
+    dump<T>(raw?: boolean): Promise<T>;
     set(interpolableKey: string, value: any): Promise<ConfigurationInterface>;
     interpolateValue<T>(_rawValue: string | Array<any> | object): Promise<T>;
     interpolateString<T>(interpolableString: string): Promise<Maybe.Maybe<T>>;

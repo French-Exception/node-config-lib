@@ -103,6 +103,27 @@ export class Configuration implements ConfigurationInterface {
         return this.args.backend.getObject();
     }
 
+    public async dump<T>(raw?: boolean): Promise<T> {
+        const object = {};
+
+        await (async () => {
+            const firstLevelObjects = await this.getObject();
+
+            const p = Object.keys(firstLevelObjects).map(async (key: string) => {
+                const interpolatedKey = <string>await this.interpolateString(key);
+                const value = await this._get(interpolatedKey);
+                if (raw)
+                    object[interpolatedKey] = value;
+                else
+                    object[interpolatedKey] = await this.interpolateValue(<any>value);
+            })
+
+            await Promise.all(p);
+        })();
+
+        return <any>object;
+    }
+
     public async set(interpolableKey: string, value: any): Promise<ConfigurationInterface> {
         if (undefined === interpolableKey || null === interpolableKey || "" === interpolableKey)
             throw new Error('Key cannot be empty');

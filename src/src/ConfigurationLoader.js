@@ -67,7 +67,7 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                         if (!args.configuration) {
                             args.configuration = new Configuration_1.Configuration();
                         }
-                        c = args.configuration = args.configuration || new Configuration_1.Configuration({ $: args.$, env: args.env });
+                        c = args.configuration;
                         if (!args.env) return [3 /*break*/, 2];
                         return [4 /*yield*/, c.merge(args.env)];
                     case 1:
@@ -88,6 +88,9 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                         return [4 /*yield*/, this.imports(args.declaration.imports, args.configuration, args.root)];
                     case 6:
                         _b.sent();
+                        return [4 /*yield*/, c.merge(args.declaration.$)];
+                    case 7:
+                        _b.sent();
                         this.emit('fromDeclaration.stop', args);
                         return [2 /*return*/, c];
                 }
@@ -96,7 +99,7 @@ var ConfigurationLoader = /** @class */ (function (_super) {
     };
     ConfigurationLoader.prototype.fromFile = function (args) {
         return __awaiter(this, void 0, void 0, function () {
-            var file, d;
+            var file, d, c;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -112,7 +115,7 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                         return [4 /*yield*/, args.configuration.interpolateString(args.file)];
                     case 1:
                         file = _a.sent();
-                        return [4 /*yield*/, this.loadJsonDeclaration(file)];
+                        return [4 /*yield*/, this.loadJsonDeclaration(file, args.configuration)];
                     case 2:
                         d = _a.sent();
                         return [4 /*yield*/, this.fromDeclaration({
@@ -122,7 +125,9 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                                 env: args.env,
                                 root: args.root
                             })];
-                    case 3: return [2 /*return*/, _a.sent()];
+                    case 3:
+                        c = _a.sent();
+                        return [2 /*return*/, c];
                 }
             });
         });
@@ -149,7 +154,7 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                                         interpolatedGivenFile = _c.sent();
                                         normalizedFile = path.normalize(interpolatedGivenFile);
                                         _b = (_a = this_1).reshapeDeclaration;
-                                        return [4 /*yield*/, this_1.loadJsonDeclaration(normalizedFile)];
+                                        return [4 /*yield*/, this_1.loadJsonDeclaration(normalizedFile, configuration)];
                                     case 2: return [4 /*yield*/, _b.apply(_a, [_c.sent()])];
                                     case 3:
                                         importedDeclaration = _c.sent();
@@ -209,7 +214,7 @@ var ConfigurationLoader = /** @class */ (function (_super) {
             });
         });
     };
-    ConfigurationLoader.prototype.loadJsonDeclaration = function (file) {
+    ConfigurationLoader.prototype.loadJsonDeclaration = function (file, configuration) {
         return __awaiter(this, void 0, void 0, function () {
             var fileExtension, payload;
             var _this = this;
@@ -237,7 +242,7 @@ var ConfigurationLoader = /** @class */ (function (_super) {
                                         case 3:
                                             loaded = require(file);
                                             if (!('function' === typeof loaded)) return [3 /*break*/, 6];
-                                            result = loaded();
+                                            result = loaded(configuration);
                                             if (!(result instanceof Promise)) return [3 /*break*/, 5];
                                             return [4 /*yield*/, result];
                                         case 4: //promise

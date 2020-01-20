@@ -14,7 +14,7 @@ export class ConfigurationLoader extends EventEmitter {
         if (!args.configuration) {
             args.configuration = new Configuration();
         }
-        const c = args.configuration = args.configuration || new Configuration({$: args.$, env: args.env});
+        const c = args.configuration;
 
         if (args.env)
             await c.merge(args.env);
@@ -27,6 +27,8 @@ export class ConfigurationLoader extends EventEmitter {
         this.emit('fromDeclaration.start', args);
 
         await this.imports(args.declaration.imports, args.configuration, args.root);
+
+        await c.merge(args.declaration.$);
 
         this.emit('fromDeclaration.stop', args);
 
@@ -43,15 +45,17 @@ export class ConfigurationLoader extends EventEmitter {
 
         const file = await args.configuration.interpolateString<string>(args.file);
 
-        const d = await this.loadJsonDeclaration(<string>file);
+        const d = await this.loadJsonDeclaration(<string>file, args.configuration);
 
-        return await this.fromDeclaration({
+        const c = await this.fromDeclaration({
             declaration: d,
             $: args.$,
             configuration: args.configuration,
             env: args.env,
             root: args.root
         })
+
+        return c;
     }
 
     protected async imports(imports: Array<string>, configuration: ConfigurationInterface, root: string): Promise<ConfigurationInterface> {
@@ -69,7 +73,7 @@ export class ConfigurationLoader extends EventEmitter {
 
                 const importedDeclaration: ConfigurationDeclarationInterface =
                     await this.reshapeDeclaration(
-                        await this.loadJsonDeclaration(normalizedFile)
+                        await this.loadJsonDeclaration(normalizedFile, configuration)
                     );
 
                 this.emit('fromDeclaration.import', {
@@ -100,7 +104,7 @@ export class ConfigurationLoader extends EventEmitter {
         return d;
     }
 
-    protected async loadJsonDeclaration(file: string): Promise<ConfigurationDeclarationInterface> {
+    protected async loadJsonDeclaration(file: string, configuration: ConfigurationInterface): Promise<ConfigurationDeclarationInterface> {
         const fileExtension = path.extname(file);
         const payload = await (async () => {
             switch (fileExtension) {
@@ -114,7 +118,7 @@ export class ConfigurationLoader extends EventEmitter {
                     // can be a simple JS object or a function returning a Promise
                     const loaded = require(file);
                     if ('function' === typeof loaded) {
-                        const result = loaded();
+                        const result = loaded(configuration);
                         if (result instanceof Promise) { //promise
                             return await <Promise<any>>result;
                         }

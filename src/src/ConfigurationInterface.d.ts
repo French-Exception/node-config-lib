@@ -8,4 +8,5 @@ export interface ConfigurationInterface {
     save(toFile: string): Promise<string>;
     changes(): Promise<object>;
     getObject<T>(): Promise<T>;
+    dump<T>(raw?: boolean): Promise<T>;
 }

@@ -17,4 +17,6 @@ export interface ConfigurationInterface {
     changes(): Promise<object>
 
     getObject<T>(): Promise<T>
+
+    dump<T>(raw?: boolean): Promise<T>
 }
