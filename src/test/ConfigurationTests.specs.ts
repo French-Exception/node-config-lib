@@ -37,20 +37,20 @@ describe('Configuration', function () {
     })
 
     it('can save changes', async function () {
-        const c = new Configuration();
+        const c = new Configuration({env: {env: 'dev'}});
 
         await c.set('foo', {bar: 'foobar'})
 
-        const saveTo = path.join(path.dirname(__dirname), '..', 'test-res', '__test.json');
+        const saveTo = path.join(path.dirname(__dirname), '..', 'test-res', '__test_%env%.json');
 
-        await c.save(saveTo);
+        const savedTo = await c.save(saveTo);
 
-        const jsonSaved = await fs.readFile(saveTo)
+        const jsonSaved = await fs.readFile(savedTo)
 
         const loaded = JSON.parse(jsonSaved.toString());
 
         expect(loaded).to.be.deep.equal({$: {foo: {bar: 'foobar'}}});
 
-        await fs.remove(saveTo);
+        await fs.remove(savedTo);
     })
 })

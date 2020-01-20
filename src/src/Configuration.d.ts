@@ -18,7 +18,7 @@ export declare class Configuration implements ConfigurationInterface {
     _get<T>(interpolatedKey: string | Array<string>): Promise<T>;
     changes(): Promise<Array<{}>>;
     resetChanges(): void;
-    save(toFile: string): Promise<void>;
+    save(toFile: string): Promise<string>;
     getObject<T>(): Promise<T>;
     set(interpolableKey: string, value: any): Promise<ConfigurationInterface>;
     interpolateValue<T>(_rawValue: string | Array<any> | object): Promise<T>;

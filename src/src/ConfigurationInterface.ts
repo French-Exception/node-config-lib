@@ -12,7 +12,7 @@ export interface ConfigurationInterface {
 
     interpolateValue<T>(interpolable: string | Array<any> | object): Promise<Maybe.Maybe<T>>;
 
-    save(toFile: string): Promise<void>
+    save(toFile: string): Promise<string>
 
     changes(): Promise<object>
 

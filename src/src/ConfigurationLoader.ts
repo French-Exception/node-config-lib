@@ -11,7 +11,13 @@ const path = require('path');
 export class ConfigurationLoader extends EventEmitter {
 
     public async fromDeclaration(args: ConfigurationLoaderFromDeclarationRequestInterface): Promise<ConfigurationInterface> {
+        if (!args.configuration) {
+            args.configuration = new Configuration();
+        }
         const c = args.configuration = args.configuration || new Configuration({$: args.$, env: args.env});
+
+        if (args.env)
+            await c.merge(args.env);
 
         if (args.$)
             await c.merge(args.$);
@@ -35,7 +41,9 @@ export class ConfigurationLoader extends EventEmitter {
 
         args.configuration = args.configuration || new Configuration({env: args.env, $: args.$});
 
-        const d = await this.loadJsonDeclaration(args.file);
+        const file = await args.configuration.interpolateString<string>(args.file);
+
+        const d = await this.loadJsonDeclaration(<string>file);
 
         return await this.fromDeclaration({
             declaration: d,

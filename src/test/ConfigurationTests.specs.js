@@ -95,24 +95,24 @@ describe('Configuration', function () {
     });
     it('can save changes', function () {
         return __awaiter(this, void 0, void 0, function () {
-            var c, saveTo, jsonSaved, loaded;
+            var c, saveTo, savedTo, jsonSaved, loaded;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        c = new Configuration_1.Configuration();
+                        c = new Configuration_1.Configuration({ env: { env: 'dev' } });
                         return [4 /*yield*/, c.set('foo', { bar: 'foobar' })];
                     case 1:
                         _a.sent();
-                        saveTo = path.join(path.dirname(__dirname), '..', 'test-res', '__test.json');
+                        saveTo = path.join(path.dirname(__dirname), '..', 'test-res', '__test_%env%.json');
                         return [4 /*yield*/, c.save(saveTo)];
                     case 2:
-                        _a.sent();
-                        return [4 /*yield*/, fs.readFile(saveTo)];
+                        savedTo = _a.sent();
+                        return [4 /*yield*/, fs.readFile(savedTo)];
                     case 3:
                         jsonSaved = _a.sent();
                         loaded = JSON.parse(jsonSaved.toString());
                         chai_1.expect(loaded).to.be.deep.equal({ $: { foo: { bar: 'foobar' } } });
-                        return [4 /*yield*/, fs.remove(saveTo)];
+                        return [4 /*yield*/, fs.remove(savedTo)];
                     case 4:
                         _a.sent();
                         return [2 /*return*/];

@@ -142,7 +142,7 @@ var Configuration = /** @class */ (function () {
     };
     Configuration.prototype.save = function (toFile) {
         return __awaiter(this, void 0, void 0, function () {
-            var changes, configToSave, promisesChanges, _objectChanges;
+            var changes, configToSave, promisesChanges, interpolatedSaveToFile, _objectChanges;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -159,13 +159,16 @@ var Configuration = /** @class */ (function () {
                         return [4 /*yield*/, Promise.all(promisesChanges)];
                     case 2:
                         _a.sent();
-                        return [4 /*yield*/, configToSave.getObject()];
+                        return [4 /*yield*/, this.interpolateString(toFile)];
                     case 3:
-                        _objectChanges = _a.sent();
-                        return [4 /*yield*/, fs.writeFile(toFile, JSON.stringify({ $: _objectChanges }, null, 2))];
+                        interpolatedSaveToFile = _a.sent();
+                        return [4 /*yield*/, configToSave.getObject()];
                     case 4:
+                        _objectChanges = _a.sent();
+                        return [4 /*yield*/, fs.writeFile(interpolatedSaveToFile, JSON.stringify({ $: _objectChanges }, null, 2))];
+                    case 5:
                         _a.sent();
-                        return [2 /*return*/];
+                        return [2 /*return*/, interpolatedSaveToFile];
                 }
             });
         });

@@ -79,7 +79,7 @@ export class Configuration implements ConfigurationInterface {
         this._changes = [];
     }
 
-    public async save(toFile: string): Promise<void> {
+    public async save(toFile: string): Promise<string> {
         const changes = await this.changes();
 
         const configToSave = new Configuration();
@@ -91,9 +91,12 @@ export class Configuration implements ConfigurationInterface {
 
         await Promise.all(promisesChanges);
 
+        const interpolatedSaveToFile: string = <string>await this.interpolateString(toFile);
         const _objectChanges = await configToSave.getObject();
 
-        await fs.writeFile(toFile, JSON.stringify({$: _objectChanges}, null, 2));
+        await fs.writeFile(interpolatedSaveToFile, JSON.stringify({$: _objectChanges}, null, 2));
+
+        return interpolatedSaveToFile;
     }
 
     public async getObject<T>(): Promise<T> {
