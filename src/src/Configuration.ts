@@ -1,11 +1,11 @@
 import {ConfigurationInterface} from "./ConfigurationInterface";
-import * as _ from "underscore";
 import {ConfigurationBackendInterface} from "./ConfigurationBackendInterface";
 import {ConfigurationBackend} from "./ConfigurationBackend";
 import * as merge from "deepmerge";
 import * as Maybe from "maybe.ts"
+import * as fs from "fs-extra"
 
-export const VERSION:string='1.0'
+export const VERSION: string = '1.0'
 
 const object_walker = require('object-walker');
 
@@ -16,9 +16,17 @@ export interface ConfigurationConstructionArguments {
     $?: object
 }
 
+interface ConfigurationChange<T> {
+    interpolatedKey: string
+    interpolableKey: string
+    value: T
+}
+
 export class Configuration implements ConfigurationInterface {
 
     private readonly args: ConfigurationConstructionArguments;
+
+    private _changes: Array<ConfigurationChange<any>>;
 
     constructor(args?: ConfigurationConstructionArguments) {
         this.args = args || {};
@@ -26,7 +34,10 @@ export class Configuration implements ConfigurationInterface {
         this.args.env = (!args || !args.env) ? {} : args.env;
         this.args.$ = (!args || !args.$) ? this.args.env : merge(this.args.$, this.args.env);
         this.args.backend = (!args || !args.backend) ? new ConfigurationBackend(this.args.$) : args.backend;
+
+        this._changes = [];
     }
+
 
     public async merge(source: object): Promise<ConfigurationInterface> {
         await this.args.backend.merge(source);
@@ -55,9 +66,38 @@ export class Configuration implements ConfigurationInterface {
         if (undefined === interpolatedKey || null === interpolatedKey || "" === interpolatedKey)
             throw new Error('Key cannot be empty');
 
-        const _key: Array<string> = _.isArray(interpolatedKey) ? <Array<string>>interpolatedKey : <Array<string>>(<string>interpolatedKey).split('.');
+        const _key: Array<string> = Array.isArray(interpolatedKey) ? <Array<string>>interpolatedKey : <Array<string>>(<string>interpolatedKey).split('.');
         const _value: T = await this.args.backend.get<T>(_key);
         return _value;
+    }
+
+    public async changes(): Promise<Array<{}>> {
+        return this._changes;
+    }
+
+    public resetChanges() {
+        this._changes = [];
+    }
+
+    public async save(toFile: string): Promise<void> {
+        const changes = await this.changes();
+
+        const configToSave = new Configuration();
+
+        const promisesChanges = changes
+            .map(async (change: ConfigurationChange<any>) => {
+                return configToSave.set(change.interpolatedKey, change.value);
+            })
+
+        await Promise.all(promisesChanges);
+
+        const _objectChanges = await configToSave.getObject();
+
+        await fs.writeFile(toFile, JSON.stringify({$: _objectChanges}, null, 2));
+    }
+
+    public async getObject<T>(): Promise<T> {
+        return this.args.backend.getObject();
     }
 
     public async set(interpolableKey: string, value: any): Promise<ConfigurationInterface> {
@@ -65,16 +105,23 @@ export class Configuration implements ConfigurationInterface {
             throw new Error('Key cannot be empty');
 
         const _interpolatedKey: Maybe.Maybe<string> = await this.interpolateString<string>(interpolableKey);
-        await this.args.backend.set((<string>_interpolatedKey).split('.'), value);
+        const _key = (<string>_interpolatedKey).split('.')
+        await this.args.backend.set(_key, value);
+
+        this._changes.push({
+            interpolableKey: interpolableKey,
+            interpolatedKey: <string>_interpolatedKey,
+            value: value
+        });
 
         return <ConfigurationInterface>this;
     }
 
     public async interpolateValue<T>(_rawValue: string | Array<any> | object): Promise<T> {
-        if (_.isString(_rawValue)) {
+        if ("string" === typeof _rawValue) {
             const _interpolatedValue = await this.interpolateString(<string><unknown>_rawValue);
             return <any>_interpolatedValue;
-        } else if (_.isArray(_rawValue) || _.isObject(_rawValue)) {
+        } else if (Array.isArray(_rawValue) || (typeof _rawValue === 'function') || (typeof _rawValue === 'object')) {
             const _interpolatedValue: T = await this.interpolateObject<T>((<any>_rawValue));
             return _interpolatedValue;
         }
@@ -88,9 +135,9 @@ export class Configuration implements ConfigurationInterface {
             const _first: string | object = await this._interpolateString<string>(interpolableString);
             // check for interpolated keys returning interpolable keys like %%my.value%%
             // and again for %%%my.value%%% returning %%my.value1%% and again for %my.value2%
-            if (_.isString(_first) && this.isStringInterpolable(_first)) {
+            if ('string' === typeof _first && this.isStringInterpolable(_first)) {
                 return await this.interpolateString(_first);
-            } else if (_.isObject(_first)) {
+            } else if ('object' === typeof _first || 'function' === typeof _first) {
                 return await this.interpolateObject<any>((<any>_first));
             }
             return Maybe.just<T>(<any>_first);
@@ -114,16 +161,16 @@ export class Configuration implements ConfigurationInterface {
         for (const collectedItem of _collector) {
             const _key = collectedItem[0].join('.');
             const _value = collectedItem[1];
-            if (_.isString(_value)) {
+            if ('string' === typeof (_value)) {
                 const _interpolatedValue = await this.interpolateString(_value);
                 await _c.set(_key, _interpolatedValue);
-            } else if (_.isObject(_value)) {
+            } else if ('object' === typeof _value || Array.isArray(_value)) {
                 const _interpolatedValue = await this.interpolateObject(_value);
                 await _c.set(_key, _interpolatedValue);
             }
         }
 
-        return <any>_c.getObject();
+        return await _c.getObject();
     }
 
 
@@ -140,9 +187,9 @@ export class Configuration implements ConfigurationInterface {
             for (const parameterInfo of _parameters) {
                 const _key = parameterInfo[0].substr(1, parameterInfo[0].length - 2);
                 const _value = await this.getRaw<string>(_key);
-                if (_.isString(_value)) {
+                if ('string' === typeof _value) {
                     k = k.replace(parameterInfo[1], _value);
-                } else if (_.isObject(_value) && 1 == _parameters.length) {
+                } else if ('object' === typeof _value && 1 == _parameters.length) {
                     k = _value;
                 }
             }

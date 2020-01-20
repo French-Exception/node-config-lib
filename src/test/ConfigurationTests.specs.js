@@ -39,6 +39,8 @@ exports.__esModule = true;
 require("mocha");
 var Configuration_1 = require("../src/Configuration");
 var chai_1 = require("chai");
+var path = require("path");
+var fs = require("fs-extra");
 describe('Configuration', function () {
     it('can be instantiated', function (done) {
         return __awaiter(this, void 0, void 0, function () {
@@ -86,6 +88,33 @@ describe('Configuration', function () {
                     case 2:
                         foofoobar = _a.sent();
                         chai_1.expect(foofoobar).to.be.deep.equal({ foo: 'bar' });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('can save changes', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var c, saveTo, jsonSaved, loaded;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        c = new Configuration_1.Configuration();
+                        return [4 /*yield*/, c.set('foo', { bar: 'foobar' })];
+                    case 1:
+                        _a.sent();
+                        saveTo = path.join(path.dirname(__dirname), '..', 'test-res', '__test.json');
+                        return [4 /*yield*/, c.save(saveTo)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, fs.readFile(saveTo)];
+                    case 3:
+                        jsonSaved = _a.sent();
+                        loaded = JSON.parse(jsonSaved.toString());
+                        chai_1.expect(loaded).to.be.deep.equal({ $: { foo: { bar: 'foobar' } } });
+                        return [4 /*yield*/, fs.remove(saveTo)];
+                    case 4:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });

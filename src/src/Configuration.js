@@ -47,10 +47,10 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 exports.__esModule = true;
-var _ = require("underscore");
 var ConfigurationBackend_1 = require("./ConfigurationBackend");
 var merge = require("deepmerge");
 var Maybe = require("maybe.ts");
+var fs = require("fs-extra");
 exports.VERSION = '1.0';
 var object_walker = require('object-walker');
 var Configuration = /** @class */ (function () {
@@ -60,6 +60,7 @@ var Configuration = /** @class */ (function () {
         this.args.env = (!args || !args.env) ? {} : args.env;
         this.args.$ = (!args || !args.$) ? this.args.env : merge(this.args.$, this.args.env);
         this.args.backend = (!args || !args.backend) ? new ConfigurationBackend_1.ConfigurationBackend(this.args.$) : args.backend;
+        this._changes = [];
     }
     Configuration.prototype.merge = function (source) {
         return __awaiter(this, void 0, void 0, function () {
@@ -120,7 +121,7 @@ var Configuration = /** @class */ (function () {
                     case 0:
                         if (undefined === interpolatedKey || null === interpolatedKey || "" === interpolatedKey)
                             throw new Error('Key cannot be empty');
-                        _key = _.isArray(interpolatedKey) ? interpolatedKey : interpolatedKey.split('.');
+                        _key = Array.isArray(interpolatedKey) ? interpolatedKey : interpolatedKey.split('.');
                         return [4 /*yield*/, this.args.backend.get(_key)];
                     case 1:
                         _value = _a.sent();
@@ -129,9 +130,56 @@ var Configuration = /** @class */ (function () {
             });
         });
     };
+    Configuration.prototype.changes = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this._changes];
+            });
+        });
+    };
+    Configuration.prototype.resetChanges = function () {
+        this._changes = [];
+    };
+    Configuration.prototype.save = function (toFile) {
+        return __awaiter(this, void 0, void 0, function () {
+            var changes, configToSave, promisesChanges, _objectChanges;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.changes()];
+                    case 1:
+                        changes = _a.sent();
+                        configToSave = new Configuration();
+                        promisesChanges = changes
+                            .map(function (change) { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                return [2 /*return*/, configToSave.set(change.interpolatedKey, change.value)];
+                            });
+                        }); });
+                        return [4 /*yield*/, Promise.all(promisesChanges)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, configToSave.getObject()];
+                    case 3:
+                        _objectChanges = _a.sent();
+                        return [4 /*yield*/, fs.writeFile(toFile, JSON.stringify({ $: _objectChanges }, null, 2))];
+                    case 4:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Configuration.prototype.getObject = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.args.backend.getObject()];
+            });
+        });
+    };
     Configuration.prototype.set = function (interpolableKey, value) {
         return __awaiter(this, void 0, void 0, function () {
-            var _interpolatedKey;
+            var _interpolatedKey, _key;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -140,9 +188,15 @@ var Configuration = /** @class */ (function () {
                         return [4 /*yield*/, this.interpolateString(interpolableKey)];
                     case 1:
                         _interpolatedKey = _a.sent();
-                        return [4 /*yield*/, this.args.backend.set(_interpolatedKey.split('.'), value)];
+                        _key = _interpolatedKey.split('.');
+                        return [4 /*yield*/, this.args.backend.set(_key, value)];
                     case 2:
                         _a.sent();
+                        this._changes.push({
+                            interpolableKey: interpolableKey,
+                            interpolatedKey: _interpolatedKey,
+                            value: value
+                        });
                         return [2 /*return*/, this];
                 }
             });
@@ -154,13 +208,13 @@ var Configuration = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!_.isString(_rawValue)) return [3 /*break*/, 2];
+                        if (!("string" === typeof _rawValue)) return [3 /*break*/, 2];
                         return [4 /*yield*/, this.interpolateString(_rawValue)];
                     case 1:
                         _interpolatedValue = _a.sent();
                         return [2 /*return*/, _interpolatedValue];
                     case 2:
-                        if (!(_.isArray(_rawValue) || _.isObject(_rawValue))) return [3 /*break*/, 4];
+                        if (!(Array.isArray(_rawValue) || (typeof _rawValue === 'function') || (typeof _rawValue === 'object'))) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.interpolateObject(_rawValue)];
                     case 3:
                         _interpolatedValue = _a.sent();
@@ -185,11 +239,11 @@ var Configuration = /** @class */ (function () {
                         return [4 /*yield*/, this._interpolateString(interpolableString)];
                     case 2:
                         _first = _a.sent();
-                        if (!(_.isString(_first) && this.isStringInterpolable(_first))) return [3 /*break*/, 4];
+                        if (!('string' === typeof _first && this.isStringInterpolable(_first))) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.interpolateString(_first)];
                     case 3: return [2 /*return*/, _a.sent()];
                     case 4:
-                        if (!_.isObject(_first)) return [3 /*break*/, 6];
+                        if (!('object' === typeof _first || 'function' === typeof _first)) return [3 /*break*/, 6];
                         return [4 /*yield*/, this.interpolateObject(_first)];
                     case 5: return [2 /*return*/, _a.sent()];
                     case 6: return [2 /*return*/, Maybe.just(_first)];
@@ -235,7 +289,7 @@ var Configuration = /** @class */ (function () {
                         collectedItem = _collector_1_1.value;
                         _key = collectedItem[0].join('.');
                         _value = collectedItem[1];
-                        if (!_.isString(_value)) return [3 /*break*/, 5];
+                        if (!('string' === typeof (_value))) return [3 /*break*/, 5];
                         return [4 /*yield*/, this.interpolateString(_value)];
                     case 3:
                         _interpolatedValue = _b.sent();
@@ -244,7 +298,7 @@ var Configuration = /** @class */ (function () {
                         _b.sent();
                         return [3 /*break*/, 8];
                     case 5:
-                        if (!_.isObject(_value)) return [3 /*break*/, 8];
+                        if (!('object' === typeof _value || Array.isArray(_value))) return [3 /*break*/, 8];
                         return [4 /*yield*/, this.interpolateObject(_value)];
                     case 6:
                         _interpolatedValue = _b.sent();
@@ -266,7 +320,8 @@ var Configuration = /** @class */ (function () {
                         }
                         finally { if (e_1) throw e_1.error; }
                         return [7 /*endfinally*/];
-                    case 12: return [2 /*return*/, _c.getObject()];
+                    case 12: return [4 /*yield*/, _c.getObject()];
+                    case 13: return [2 /*return*/, _b.sent()];
                 }
             });
         });
@@ -300,10 +355,10 @@ var Configuration = /** @class */ (function () {
                                             return [4 /*yield*/, this.getRaw(_key)];
                                         case 3:
                                             _value = _b.sent();
-                                            if (_.isString(_value)) {
+                                            if ('string' === typeof _value) {
                                                 k = k.replace(parameterInfo[1], _value);
                                             }
-                                            else if (_.isObject(_value) && 1 == _parameters.length) {
+                                            else if ('object' === typeof _value && 1 == _parameters.length) {
                                                 k = _value;
                                             }
                                             _b.label = 4;

@@ -1,6 +1,8 @@
 import "mocha";
 import {Configuration} from "../src/Configuration";
 import {expect} from 'chai';
+import * as path from "path";
+import * as fs from "fs-extra"
 
 describe('Configuration', function () {
     it('can be instantiated', async function (done) {
@@ -32,5 +34,23 @@ describe('Configuration', function () {
         const foofoobar = await c.get<object>('foo.foo.bar', 'not found');
 
         expect(foofoobar).to.be.deep.equal({foo: 'bar'})
+    })
+
+    it('can save changes', async function () {
+        const c = new Configuration();
+
+        await c.set('foo', {bar: 'foobar'})
+
+        const saveTo = path.join(path.dirname(__dirname), '..', 'test-res', '__test.json');
+
+        await c.save(saveTo);
+
+        const jsonSaved = await fs.readFile(saveTo)
+
+        const loaded = JSON.parse(jsonSaved.toString());
+
+        expect(loaded).to.be.deep.equal({$: {foo: {bar: 'foobar'}}});
+
+        await fs.remove(saveTo);
     })
 })
