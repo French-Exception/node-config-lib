@@ -39,6 +39,7 @@ exports.__esModule = true;
 var path = require("path");
 var mkdirp = require("mkdirp");
 var fs = require("fs-extra");
+var Configuration_1 = require("./Configuration");
 var ConfigurationInit = /** @class */ (function () {
     function ConfigurationInit() {
     }
@@ -52,7 +53,7 @@ var ConfigurationInit = /** @class */ (function () {
                             imports: [],
                             ns: null,
                             $: {
-                                "foo": "bar"
+                                "version": Configuration_1.VERSION
                             }
                         };
                         return [4 /*yield*/, mkdirp(path.dirname(configFile))];

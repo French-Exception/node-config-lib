@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as mkdirp from "mkdirp"
 import * as fs from "fs-extra"
+import {VERSION} from "./Configuration";
 
 export class ConfigurationInit {
     public async init(configFile: string): Promise<void> {
@@ -8,10 +9,9 @@ export class ConfigurationInit {
             imports: [],
             ns: null,
             $: {
-                "foo": "bar"
+                "version": VERSION
             }
         };
-
 
         await mkdirp(path.dirname(configFile));
         const $str = JSON.stringify($, null, 2);
