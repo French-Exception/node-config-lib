@@ -42,6 +42,7 @@
     "deepmerge": "^4.2.2",
     "fs-extra": "^8.1.0",
     "maybe.ts": "^0.1.0",
-    "object-walker": "0.0.4"
+    "object-walker": "0.0.4",
+    "mkdirp": "^0.5.1"
   }
 }
