@@ -111,7 +111,7 @@ describe('Configuration', function () {
                     case 3:
                         jsonSaved = _a.sent();
                         loaded = JSON.parse(jsonSaved.toString());
-                        chai_1.expect(loaded).to.be.deep.equal({ $: { foo: { bar: 'foobar' } } });
+                        chai_1.expect(loaded).to.be.deep.equal({ $: { foo: { bar: 'foobar' } }, ns: '', imports: [] });
                         return [4 /*yield*/, fs.remove(savedTo)];
                     case 4:
                         _a.sent();

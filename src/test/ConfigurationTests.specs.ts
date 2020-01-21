@@ -49,7 +49,7 @@ describe('Configuration', function () {
 
         const loaded = JSON.parse(jsonSaved.toString());
 
-        expect(loaded).to.be.deep.equal({$: {foo: {bar: 'foobar'}}});
+        expect(loaded).to.be.deep.equal({$: {foo: {bar: 'foobar'}}, ns: '', imports: []});
 
         await fs.remove(savedTo);
     })

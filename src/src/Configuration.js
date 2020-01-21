@@ -142,31 +142,77 @@ var Configuration = /** @class */ (function () {
     };
     Configuration.prototype.save = function (toFile) {
         return __awaiter(this, void 0, void 0, function () {
-            var changes, configToSave, promisesChanges, interpolatedSaveToFile, _objectChanges;
+            var changes, interpolatedSaveToFile, jsonFileStr, json;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.changes()];
+                    case 0: return [4 /*yield*/, (function () { return __awaiter(_this, void 0, void 0, function () {
+                            var _changes, configToSave;
+                            var _this = this;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, this.changes()];
+                                    case 1:
+                                        _changes = _a.sent();
+                                        configToSave = new Configuration();
+                                        return [4 /*yield*/, Promise.all(_changes
+                                                .map(function (change) { return __awaiter(_this, void 0, void 0, function () {
+                                                return __generator(this, function (_a) {
+                                                    switch (_a.label) {
+                                                        case 0: return [4 /*yield*/, configToSave.set(change.interpolatedKey, change.value)];
+                                                        case 1: return [2 /*return*/, _a.sent()];
+                                                    }
+                                                });
+                                            }); }))];
+                                    case 2:
+                                        _a.sent();
+                                        return [2 /*return*/, configToSave.getObject()];
+                                }
+                            });
+                        }); })()];
                     case 1:
                         changes = _a.sent();
-                        configToSave = new Configuration();
-                        promisesChanges = changes
-                            .map(function (change) { return __awaiter(_this, void 0, void 0, function () {
-                            return __generator(this, function (_a) {
-                                return [2 /*return*/, configToSave.set(change.interpolatedKey, change.value)];
-                            });
-                        }); });
-                        return [4 /*yield*/, Promise.all(promisesChanges)];
-                    case 2:
-                        _a.sent();
                         return [4 /*yield*/, this.interpolateString(toFile)];
-                    case 3:
+                    case 2:
                         interpolatedSaveToFile = _a.sent();
-                        return [4 /*yield*/, configToSave.getObject()];
+                        return [4 /*yield*/, (function () { return __awaiter(_this, void 0, void 0, function () {
+                                var s, e_1;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            _a.trys.push([0, 2, , 3]);
+                                            return [4 /*yield*/, fs.readFile(interpolatedSaveToFile)];
+                                        case 1:
+                                            s = _a.sent();
+                                            return [2 /*return*/, s.toString()];
+                                        case 2:
+                                            e_1 = _a.sent();
+                                            if ('ENOENT' === e_1.code)
+                                                return [2 /*return*/, JSON.stringify({ imports: [], ns: '', $: {} })];
+                                            throw e_1;
+                                        case 3: return [2 /*return*/];
+                                    }
+                                });
+                            }); })()];
+                    case 3:
+                        jsonFileStr = _a.sent();
+                        json = (function () {
+                            try {
+                                return JSON.parse(jsonFileStr);
+                            }
+                            catch (e) {
+                                throw e;
+                            }
+                        })();
+                        if (!json.$)
+                            json.$ = {};
+                        json.$ = merge(json.$, changes);
+                        return [4 /*yield*/, fs.writeFile(interpolatedSaveToFile, JSON.stringify({
+                                imports: json.imports ? json.imports : [],
+                                ns: json.ns ? json.ns : '',
+                                $: json.$
+                            }, null, 2))];
                     case 4:
-                        _objectChanges = _a.sent();
-                        return [4 /*yield*/, fs.writeFile(interpolatedSaveToFile, JSON.stringify({ $: _objectChanges }, null, 2))];
-                    case 5:
                         _a.sent();
                         return [2 /*return*/, interpolatedSaveToFile];
                 }
@@ -322,8 +368,8 @@ var Configuration = /** @class */ (function () {
     };
     Configuration.prototype.interpolateObject = function (_rawValue) {
         return __awaiter(this, void 0, void 0, function () {
-            var _c, _collector, _collector_1, _collector_1_1, collectedItem, _key, _value, _interpolatedValue, _interpolatedValue, e_1_1;
-            var e_1, _a;
+            var _c, _collector, _collector_1, _collector_1_1, collectedItem, _key, _value, _interpolatedValue, _interpolatedValue, e_2_1;
+            var e_2, _a;
             var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
@@ -368,14 +414,14 @@ var Configuration = /** @class */ (function () {
                         return [3 /*break*/, 2];
                     case 9: return [3 /*break*/, 12];
                     case 10:
-                        e_1_1 = _b.sent();
-                        e_1 = { error: e_1_1 };
+                        e_2_1 = _b.sent();
+                        e_2 = { error: e_2_1 };
                         return [3 /*break*/, 12];
                     case 11:
                         try {
                             if (_collector_1_1 && !_collector_1_1.done && (_a = _collector_1["return"])) _a.call(_collector_1);
                         }
-                        finally { if (e_1) throw e_1.error; }
+                        finally { if (e_2) throw e_2.error; }
                         return [7 /*endfinally*/];
                     case 12: return [4 /*yield*/, _c.getObject()];
                     case 13: return [2 /*return*/, _b.sent()];
@@ -393,8 +439,8 @@ var Configuration = /** @class */ (function () {
                         if (undefined === interpolableKey || null === interpolableKey)
                             throw new Error('Key cannot be empty');
                         return [4 /*yield*/, (function () { return __awaiter(_this, void 0, void 0, function () {
-                                var k, _parameters, _parameters_1, _parameters_1_1, parameterInfo, _key, _value, e_2_1;
-                                var e_2, _a;
+                                var k, _parameters, _parameters_1, _parameters_1_1, parameterInfo, _key, _value, e_3_1;
+                                var e_3, _a;
                                 return __generator(this, function (_b) {
                                     switch (_b.label) {
                                         case 0:
@@ -424,14 +470,14 @@ var Configuration = /** @class */ (function () {
                                             return [3 /*break*/, 2];
                                         case 5: return [3 /*break*/, 8];
                                         case 6:
-                                            e_2_1 = _b.sent();
-                                            e_2 = { error: e_2_1 };
+                                            e_3_1 = _b.sent();
+                                            e_3 = { error: e_3_1 };
                                             return [3 /*break*/, 8];
                                         case 7:
                                             try {
                                                 if (_parameters_1_1 && !_parameters_1_1.done && (_a = _parameters_1["return"])) _a.call(_parameters_1);
                                             }
-                                            finally { if (e_2) throw e_2.error; }
+                                            finally { if (e_3) throw e_3.error; }
                                             return [7 /*endfinally*/];
                                         case 8: return [2 /*return*/, k];
                                     }

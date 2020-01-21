@@ -80,21 +80,49 @@ export class Configuration implements ConfigurationInterface {
     }
 
     public async save(toFile: string): Promise<string> {
-        const changes = await this.changes();
-
-        const configToSave = new Configuration();
-
-        const promisesChanges = changes
-            .map(async (change: ConfigurationChange<any>) => {
-                return configToSave.set(change.interpolatedKey, change.value);
-            })
-
-        await Promise.all(promisesChanges);
+        const changes = await (async () => {
+            const _changes = await this.changes();
+            const configToSave = new Configuration();
+            await Promise.all(
+                _changes
+                    .map(async (change: ConfigurationChange<any>) => {
+                        return await configToSave.set(change.interpolatedKey, change.value);
+                    })
+            );
+            return configToSave.getObject();
+        })();
 
         const interpolatedSaveToFile: string = <string>await this.interpolateString(toFile);
-        const _objectChanges = await configToSave.getObject();
 
-        await fs.writeFile(interpolatedSaveToFile, JSON.stringify({$: _objectChanges}, null, 2));
+        const jsonFileStr: string = await (async () => {
+            try {
+                const s = await fs.readFile(interpolatedSaveToFile);
+                return s.toString();
+            } catch (e) {
+                if ('ENOENT' === e.code)
+                    return JSON.stringify({imports: [], ns: '', $: {}});
+                throw e;
+            }
+        })();
+
+        const json = (() => {
+            try {
+                return JSON.parse(jsonFileStr);
+            } catch (e) {
+                throw e;
+            }
+        })();
+
+        if (!json.$)
+            json.$ = {};
+
+        json.$ = merge(json.$, changes);
+
+        await fs.writeFile(interpolatedSaveToFile, JSON.stringify({
+            imports: json.imports ? json.imports : [],
+            ns: json.ns ? json.ns : '',
+            $: json.$
+        }, null, 2));
 
         return interpolatedSaveToFile;
     }
