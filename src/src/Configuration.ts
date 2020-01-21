@@ -56,7 +56,7 @@ export class Configuration implements ConfigurationInterface {
         return _return;
     }
 
-    public async getRaw<T>(interpolatedKey: string): Promise<T> {
+    public async getRaw<T>(interpolatedKey: string): Promise<Maybe.Maybe<T>> {
         if (undefined === interpolatedKey || null === interpolatedKey) throw new Error('Key cannot be empty');
         const _value: T = await this.args.backend.get<T>(interpolatedKey);
         return _value;
@@ -239,6 +239,8 @@ export class Configuration implements ConfigurationInterface {
             for (const parameterInfo of _parameters) {
                 const _key = parameterInfo[0].substr(1, parameterInfo[0].length - 2);
                 const _value = await this.getRaw<string>(_key);
+                if (undefined === _value)
+                    throw new Error(`'${_key}' does not exist`)
                 if ('string' === typeof _value) {
                     k = k.replace(parameterInfo[1], _value);
                 } else if ('object' === typeof _value && 1 == _parameters.length) {

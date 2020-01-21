@@ -14,7 +14,7 @@ export declare class Configuration implements ConfigurationInterface {
     constructor(args?: ConfigurationConstructionArguments);
     merge(source: object): Promise<ConfigurationInterface>;
     get<T>(interpolableKey: string, defaultIfUndef?: any): Promise<Maybe.Maybe<T>>;
-    getRaw<T>(interpolatedKey: string): Promise<T>;
+    getRaw<T>(interpolatedKey: string): Promise<Maybe.Maybe<T>>;
     _get<T>(interpolatedKey: string | Array<string>): Promise<T>;
     changes(): Promise<Array<{}>>;
     resetChanges(): void;

@@ -458,6 +458,8 @@ var Configuration = /** @class */ (function () {
                                             return [4 /*yield*/, this.getRaw(_key)];
                                         case 3:
                                             _value = _b.sent();
+                                            if (undefined === _value)
+                                                throw new Error("'" + _key + "' does not exist");
                                             if ('string' === typeof _value) {
                                                 k = k.replace(parameterInfo[1], _value);
                                             }
