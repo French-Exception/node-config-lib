@@ -10,8 +10,8 @@ describe('ConfigurationLoader', function () {
             const loader = new src_1.ConfigurationLoader();
             const requestBuilder = new src_1.ConfigurationLoaderFromFileRequestBuilder();
             requestBuilder
-                .withFile(path.normalize(path.join(__dirname, '..', '..', 'test-res', 'js.js')))
-                .withRoot(path.normalize(path.join(__dirname, '..', '..', 'test-res')))
+                .withFile(path.normalize(path.join(__dirname, '..', 'test-res', 'js.js')))
+                .withRoot(path.normalize(path.join(__dirname, '..', 'test-res')))
                 .withEnv({ env: 'dev' });
             const request = await requestBuilder.build();
             return await loader.fromFile(request);
@@ -27,4 +27,4 @@ describe('ConfigurationLoader', function () {
         this.test.callback();
     });
 });
-//# sourceMappingURL=ConfigurationLoaderTest.specs.js.map
+//# sourceMappingURL=ConfigurationLoader.specs.js.map

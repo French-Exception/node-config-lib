@@ -20,11 +20,12 @@
     "target": "ES2020",
     "typeRoots": [
       "./node_modules/@types",
-      "./src/src"
+      "./src/"
     ],
     "watch": false
   },
   "include": [
-    "./src/**/*"
+    "./src/**/*",
+    "test/**/*.specs.*"
   ]
 }

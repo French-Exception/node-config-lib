@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("mocha");
-const Configuration_1 = require("../src/Configuration");
+const impl_1 = require("./../src/impl/");
 const chai_1 = require("chai");
 const path = require("path");
 const fs = require("fs-extra");
 describe('Configuration', function () {
     it('can be instantiated', async function (done) {
-        const c = new Configuration_1.Configuration({
+        const c = new impl_1.Configuration({
             $: {
                 foo: {
                     bar: 'foobar',
@@ -24,20 +24,20 @@ describe('Configuration', function () {
         this.test.callback();
     });
     it('can set and get', async function () {
-        const c = new Configuration_1.Configuration();
+        const c = new impl_1.Configuration();
         await c.set('foo.foo.bar', { foo: 'bar' });
         const foofoobar = await c.get('foo.foo.bar', 'not found');
         chai_1.expect(foofoobar).to.be.deep.equal({ foo: 'bar' });
     });
     it('can save changes', async function () {
-        const c = new Configuration_1.Configuration({ env: { env: 'dev' } });
+        const c = new impl_1.Configuration({ env: { env: 'dev' } });
         await c.set('foo', { bar: 'foobar' });
-        const saveTo = path.join(path.dirname(__dirname), '..', 'test-res', '__test_%env%.json');
-        const savedTo = await c.save(saveTo);
+        const to = path.join(path.dirname(__dirname), 'test-res', '__test_%env%.json');
+        const savedTo = await c.save(to);
         const jsonSaved = await fs.readFile(savedTo);
         const loaded = JSON.parse(jsonSaved.toString());
         chai_1.expect(loaded).to.be.deep.equal({ $: { foo: { bar: 'foobar' } }, ns: '', imports: [] });
         await fs.remove(savedTo);
     });
 });
-//# sourceMappingURL=ConfigurationTests.specs.js.map
+//# sourceMappingURL=Configuration.specs.js.map
