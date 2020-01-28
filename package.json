@@ -44,5 +44,9 @@
     "maybe.ts": "^0.1.0",
     "object-walker": "0.0.4",
     "mkdirp": "^0.5.1"
+  },
+  "engines": {
+    "node": ">= 12.14",
+    "npm" : ">= 6.13.4"
   }
 }
