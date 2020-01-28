@@ -2,8 +2,8 @@
   "name": "@frenchex/config-lib",
   "version": "0.1.12",
   "description": "Flexible Configuration Library based on .json or .js files (raw JSON or promises)",
-  "main": "src/src/index.js",
-  "types": "src/src/index.d.ts",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
   "scripts": {
     "test": "mocha -r ts-node/register -r source-map-support/register src/test/**/*.specs.ts",
     "test:watch": "nodemon",
