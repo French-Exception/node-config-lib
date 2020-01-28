@@ -5,5 +5,5 @@
   ],
   "exec": "npm run test",
   "ext": ".ts",
-  "watch": ["./src/"]
+  "watch": ["./src/", "./test/"]
 }
