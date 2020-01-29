@@ -2,8 +2,15 @@ import {Configuration} from "./../src/impl/"
 import {expect} from 'chai'
 import * as path from "path"
 import * as fs from "fs-extra"
+import {performance, PerformanceObserver} from 'perf_hooks';
 
-export const MAKE_IT_A_MODULE = {};
+const performanceObserver = new PerformanceObserver((items, observer) => {
+    for (const item of items.getEntries()) {
+        console.log(`${item.entryType}: ${item.name}: ${item.duration}ms`);
+    }
+    observer.disconnect();
+});
+performanceObserver.observe({entryTypes: ['measure']});
 
 const unit_call = async (expect) => {
     const c = new Configuration({
@@ -66,7 +73,13 @@ describe('Configuration', function () {
 
     it('is performant', async function () {
 
+        performance.mark('start');
+
         for (let i = 0, j = 100; i < j; i++)
             await unit_call(expect);
+
+        performance.mark('end');
+
+        performance.measure('start to end', 'start', 'end')
     })
 })
