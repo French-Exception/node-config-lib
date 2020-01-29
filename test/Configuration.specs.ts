@@ -104,7 +104,7 @@ describe('Configuration', function () {
                 100,
                 expect
             ))
-            .to.be.lte(1, `Construction must be lte`);
+            .to.be.lte(1000 /** make it high for loaded CI services **/, `Construction must be lte`);
 
     });
 
@@ -117,7 +117,7 @@ describe('Configuration', function () {
             .measureAverage(async () => {
                     await configUnderTest.set('foo', 'bar');
                 },
-                1,
+                100,
                 expect
             ))
             .to.be.lessThan(1000 /** make it high for loaded CI services **/,
