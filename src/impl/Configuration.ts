@@ -1,5 +1,4 @@
 import {ConfigurationInterface} from "./../api/ConfigurationInterface";
-import {ConfigurationBackendInterface} from "./../api/ConfigurationBackendInterface";
 import {ConfigurationDeletionInterface} from "./../api/ConfigurationDeletionInterface"
 import {ConfigurationChangeInterface} from "./../api/ConfigurationChangeInterface"
 import {ConfigurationConstructionArgumentsInterface} from "./../api/ConfigurationConstructionArgumentsInterface"
@@ -252,16 +251,6 @@ export class Configuration implements ConfigurationInterface {
     }
 
     /**
-     * @deprecated
-     * @param string
-     */
-    public async isStringInterpolable(string: string): Promise<boolean> {
-        const _parameters = this.extractParameters(string);
-
-        return _parameters.length > 0;
-    }
-
-    /**
      *
      * @param string
      */
@@ -346,10 +335,12 @@ export class Configuration implements ConfigurationInterface {
      * @param key
      */
     public extractParameters(key: string): Array<[string, RegExp]> {
-        if (this._keyParamsCache[key])
+        if (this._keyParamsCache[key]) {
             return this._keyParamsCache[key];
+        }
 
-        const regex = this.args.keyRegex
+
+        const regex = this.args.keyRegex;
         const r = [];
         let m;
         while ((m = regex.exec(key)) !== null) {

@@ -73,11 +73,6 @@ export declare class Configuration implements ConfigurationInterface {
      */
     interpolateString<T>(interpolableString: string): Promise<Maybe.Maybe<T>>;
     /**
-     * @deprecated
-     * @param string
-     */
-    isStringInterpolable(string: string): Promise<boolean>;
-    /**
      *
      * @param string
      */

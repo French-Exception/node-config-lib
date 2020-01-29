@@ -192,14 +192,6 @@ class Configuration {
         return interpolableString;
     }
     /**
-     * @deprecated
-     * @param string
-     */
-    async isStringInterpolable(string) {
-        const _parameters = this.extractParameters(string);
-        return _parameters.length > 0;
-    }
-    /**
      *
      * @param string
      */
@@ -269,8 +261,9 @@ class Configuration {
      * @param key
      */
     extractParameters(key) {
-        if (this._keyParamsCache[key])
+        if (this._keyParamsCache[key]) {
             return this._keyParamsCache[key];
+        }
         const regex = this.args.keyRegex;
         const r = [];
         let m;
