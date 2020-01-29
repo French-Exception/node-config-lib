@@ -1,10 +1,8 @@
-import * as Maybe from "maybe.ts"
+import * as Maybe from "maybe.ts";
 
 export interface ConfigurationInterface {
 
     get<T>(interpolableKey: string, defaultIfUndef?: any): Promise<Maybe.Maybe<T>>
-
-    getRaw<T>(interpolableKey: string, defaultIfUndef?: any): Promise<Maybe.Maybe<T>>
 
     set(interpolableKey: string, value: any): Promise<ConfigurationInterface>
 

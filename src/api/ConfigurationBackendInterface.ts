@@ -1,9 +1,11 @@
-export interface ConfigurationBackendInterface {
-    set<T>(key: string | Array<string>, value: T): Promise<ConfigurationBackendInterface>
+import {Maybe} from "maybe.ts";
 
-    get<T>(key: string | Array<string>): Promise<T | undefined>
+export interface ConfigurationBackendInterface {
+    set<T>(key: Array<string>, value: T): Promise<ConfigurationBackendInterface>
+
+    get<T>(key: Array<string>): Promise<Maybe<T> | undefined>
 
     getObject<T>(): Promise<T>
 
-    merge(source: object): Promise<ConfigurationBackendInterface>
+    merge(source: object, clone?: boolean): Promise<ConfigurationBackendInterface>
 }

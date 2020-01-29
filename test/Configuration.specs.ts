@@ -1,4 +1,3 @@
-import * as mocha from "mocha"
 import {Configuration} from "./../src/impl/"
 import {expect} from 'chai'
 import * as path from "path"

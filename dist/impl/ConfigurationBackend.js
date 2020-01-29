@@ -2,32 +2,87 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const merge = require("deepmerge");
 class ConfigurationBackend {
+    /**
+     *
+     * @param baseObject Base object to use instead of empty object
+     */
     constructor(baseObject) {
         this.real_object = baseObject || {};
     }
-    async merge(obj) {
-        const merged = merge(this.real_object, obj, { clone: true });
+    /**
+     * Merges object onto real_object
+     * @param obj
+     * @param clone
+     */
+    async merge(obj, clone) {
+        clone = !!clone;
+        const merged = merge(this.real_object, obj, { clone: clone });
         this.real_object = merged;
         return this;
     }
+    /**
+     * Returns the real object backing data
+     */
     async getObject() {
         return this.real_object;
     }
-    async get(key) {
-        if (null == key || undefined === key)
-            throw new Error('Key cannot be empty');
-        const _key = Array.isArray(key) ? key : key.split('.');
-        const _value = _getProperty(this.real_object, _key);
-        return _value;
+    /**
+     *
+     * @param key
+     */
+    async get(key, target) {
+        target = target || this.real_object;
+        if (key.length == 0 || target == undefined) {
+            return target;
+        }
+        let current = key.shift();
+        if (current.indexOf("[") >= 0) {
+            let match = current.match(exports.ARRAY_MATCH);
+            current = match[1];
+            if (match[2]) {
+                const index = Number(match[2]);
+                return this.get(target[current][index], key);
+            }
+            else {
+                return target[current];
+            }
+        }
+        else {
+            return await this.get(key, target[current]);
+        }
     }
-    async set(key, value) {
-        if (null === key || undefined === key)
-            throw new Error('Key cannot be empty');
-        _setProperty(this.real_object, Array.isArray(key) ? key : key.split('.'), value);
+    /**
+     *
+     * @param key
+     * @param value
+     */
+    async set(key, value, target) {
+        target = target || this.real_object;
+        if (0 === key.length)
+            return value;
+        let current = key.shift();
+        if (current.indexOf("[") >= 0) {
+            var match = current.match(exports.ARRAY_MATCH);
+            current = match[1];
+            target[current] = target[current] || [];
+            if (match[2]) {
+                const index = Number(match[2]);
+                target[current][index] = await this.set(key, value, target[current][index] || {});
+            }
+            else {
+                target[current].push(this.set(key, value, {}));
+            }
+            return target;
+        }
+        else {
+            target[current] = await this.set(key, value, target[current] || {});
+            return target;
+        }
         return this;
     }
 }
 exports.ConfigurationBackend = ConfigurationBackend;
+/** @todo from binder.js add licence & link **/
 exports.ARRAY_MATCH = /(.*)\[(\d*)\]/;
 function _getProperty(target, path) {
     if (path.length == 0 || target == undefined) {

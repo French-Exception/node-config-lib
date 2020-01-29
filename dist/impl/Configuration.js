@@ -13,39 +13,65 @@ class Configuration {
         this.args.env = (!args || !args.env) ? {} : args.env;
         this.args.$ = (!args || !args.$) ? this.args.env : merge(this.args.$, this.args.env);
         this.args.backend = (!args || !args.backend) ? new ConfigurationBackend_1.ConfigurationBackend(this.args.$) : args.backend;
+        this._keyParamsCache = {};
         this._changes = [];
+        this._deletions = [];
     }
     async merge(source) {
         await this.args.backend.merge(source);
         return this;
     }
     async get(interpolableKey, defaultIfUndef) {
-        if ('string' != typeof interpolableKey || 0 === interpolableKey.length)
-            throw new Error('Key must be a string and cannot be empty');
         const _interpolatedKey = await this.interpolateString(interpolableKey);
         const _rawValue = await this._get(_interpolatedKey);
         const _interpolatedValue = await this.interpolateValue(_rawValue);
-        const _return = Maybe.or(_interpolatedValue, defaultIfUndef);
-        return _return;
+        return Maybe.or(_interpolatedValue, defaultIfUndef);
     }
-    async getRaw(interpolatedKey) {
-        if (undefined === interpolatedKey || null === interpolatedKey)
-            throw new Error('Key cannot be empty');
-        const _value = await this.args.backend.get(interpolatedKey);
-        return _value;
-    }
+    /**
+     * Returs raw, not interpolated values
+     * Can include %% parameters to be resolved
+     *
+     * @param interpolatedKey
+     * @private
+     */
     async _get(interpolatedKey) {
-        if (undefined === interpolatedKey || null === interpolatedKey || "" === interpolatedKey)
-            throw new Error('Key cannot be empty');
-        const _key = Array.isArray(interpolatedKey) ? interpolatedKey : interpolatedKey.split('.');
-        const _value = await this.args.backend.get(_key);
-        return _value;
+        const _key = interpolatedKey.split('.');
+        return (await this.args.backend.get(_key));
     }
+    /**
+     * Retains changes made to object, to be used on save()
+     * @return changes
+     */
     async changes() {
         return this._changes;
     }
-    resetChanges() {
+    /**
+     * Reset changes made to object.
+     */
+    async resetChanges() {
         this._changes = [];
+        return this;
+    }
+    /**
+     * Retains deletions made to object, to be used on save()
+     */
+    async deletions() {
+        return this._deletions;
+    }
+    /**
+     * Reset deletions made to object, to be used on save()
+     */
+    async resetDeletions() {
+        this._deletions = [];
+    }
+    /**
+     * caches parameters extraction
+     */
+    async keyParams() {
+        return this._keyParamsCache;
+    }
+    async resetKeyParams() {
+        this._keyParamsCache = {};
     }
     async save(toFile) {
         const changes = await (async () => {
@@ -106,9 +132,12 @@ class Configuration {
         })();
         return object;
     }
+    /**
+     *
+     * @param interpolableKey
+     * @param value
+     */
     async set(interpolableKey, value) {
-        if (undefined === interpolableKey || null === interpolableKey || "" === interpolableKey)
-            throw new Error('Key cannot be empty');
         const _interpolatedKey = await this.interpolateString(interpolableKey);
         const _key = _interpolatedKey.split('.');
         await this.args.backend.set(_key, value);
@@ -119,48 +148,80 @@ class Configuration {
         });
         return this;
     }
+    /**
+     *
+     * @param _rawValue
+     */
     async interpolateValue(_rawValue) {
         if ("string" === typeof _rawValue) {
             const _interpolatedValue = await this.interpolateString(_rawValue);
             return _interpolatedValue;
         }
-        else if (Array.isArray(_rawValue) || (typeof _rawValue === 'function') || (typeof _rawValue === 'object')) {
+        else if (Array.isArray(_rawValue) || (typeof _rawValue === 'object')) {
             const _interpolatedValue = await this.interpolateObject(_rawValue);
             return _interpolatedValue;
         }
+        else {
+            throw new Error('lol');
+        }
     }
+    /**
+     *
+     * @param interpolableString
+     */
     async interpolateString(interpolableString) {
-        if (undefined === interpolableString || null === interpolableString)
-            throw new Error('Key cannot be empty');
-        const isStringInterpolable = await this.isStringInterpolable(interpolableString);
-        if (true === isStringInterpolable) {
-            const _first = await this._interpolateString(interpolableString);
+        const extractedParameters = await this.getStringExtractedParametersIfAnyOrFalse(interpolableString);
+        if (false === extractedParameters) {
+            return interpolableString;
+        }
+        if (extractedParameters && extractedParameters['params'].length > 0) {
+            const _firstDerivative = await this._interpolateString(interpolableString);
             // check for interpolated keys returning interpolable keys like %%my.value%%
             // and again for %%%my.value%%% returning %%my.value1%% and again for %my.value2%
-            if ('string' === typeof _first && this.isStringInterpolable(_first)) {
-                return await this.interpolateString(_first);
+            if ('string' === typeof _firstDerivative) {
+                const parameters = await this.getStringExtractedParametersIfAnyOrFalse(_firstDerivative);
+                if (parameters) {
+                    return await this.interpolateString(_firstDerivative);
+                }
             }
-            else if ('object' === typeof _first || 'function' === typeof _first) {
-                return await this.interpolateObject(_first);
+            else if ('object' === typeof _firstDerivative || Array.isArray(_firstDerivative)) {
+                return await this.interpolateObject(_firstDerivative);
             }
-            return Maybe.just(_first);
+            return Maybe.just(_firstDerivative);
         }
         return interpolableString;
     }
+    /**
+     * @deprecated
+     * @param string
+     */
     async isStringInterpolable(string) {
-        if (undefined === string || null === string)
-            throw new Error('Key cannot be empty');
-        const _parameters = this.extractParameters(string, this.args.keyRegex);
+        const _parameters = this.extractParameters(string);
         return _parameters.length > 0;
     }
+    /**
+     *
+     * @param string
+     */
+    async getStringExtractedParametersIfAnyOrFalse(string) {
+        const _parameters = this.extractParameters(string);
+        if (_parameters.length > 0)
+            return { key: string, params: _parameters };
+        return false;
+    }
+    /**
+     *
+     * @param _rawValue
+     */
     async interpolateObject(_rawValue) {
         const _c = new ConfigurationBackend_1.ConfigurationBackend();
         const _collector = [];
-        object_walker.walkObject(_rawValue, async (keys, value) => {
+        object_walker
+            .walkObject(_rawValue, (keys, value) => {
             _collector.push([keys, value]);
         });
         for (const collectedItem of _collector) {
-            const _key = collectedItem[0].join('.');
+            const _key = collectedItem[0];
             const _value = collectedItem[1];
             if ('string' === typeof (_value)) {
                 const _interpolatedValue = await this.interpolateString(_value);
@@ -173,18 +234,24 @@ class Configuration {
         }
         return await _c.getObject();
     }
+    /**
+     *
+     * @param interpolableKey
+     * @private
+     */
     async _interpolateString(interpolableKey) {
-        if (undefined === interpolableKey || null === interpolableKey)
-            throw new Error('Key cannot be empty');
-        let m;
         const _result = await (async () => {
             let k = interpolableKey;
-            const _parameters = this.extractParameters(k, this.args.keyRegex);
+            const _parameters = this.extractParameters(k);
             for (const parameterInfo of _parameters) {
+                // remove %%
                 const _key = parameterInfo[0].substr(1, parameterInfo[0].length - 2);
-                const _value = await this.getRaw(_key);
+                // fetch Maybe value from backend;
+                const _value = await this._get(_key);
+                // test Maybe value, throwing if necessary
                 if (undefined === _value)
                     throw new Error(`'${_key}' does not exist`);
+                // if string : replace ; elseif object return object
                 if ('string' === typeof _value) {
                     k = k.replace(parameterInfo[1], _value);
                 }
@@ -197,10 +264,14 @@ class Configuration {
         // can be string or object, so don't bother with it here, will be typed upper
         return _result;
     }
-    extractParameters(key, regex) {
-        if (undefined === key || null === key)
-            throw new Error('Key cannot be empty');
-        regex = regex || this.args.keyRegex;
+    /**
+     *
+     * @param key
+     */
+    extractParameters(key) {
+        if (this._keyParamsCache[key])
+            return this._keyParamsCache[key];
+        const regex = this.args.keyRegex;
         const r = [];
         let m;
         while ((m = regex.exec(key)) !== null) {
@@ -212,6 +283,7 @@ class Configuration {
                 r.push([match, new RegExp(match, 'g')]);
             });
         }
+        this._keyParamsCache[key] = r;
         return r;
     }
 }
