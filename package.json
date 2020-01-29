@@ -9,6 +9,7 @@
   },
   "description": "Flexible Configuration Library based on .json or .js files (raw JSON or promises)",
   "devDependencies": {
+    "@frenchex/function-load-perf-tester-lib": "0.0.1",
     "@types/chai": "^4.2.7",
     "@types/deepmerge": "^2.2.0",
     "@types/fs-extra": "^8.0.1",

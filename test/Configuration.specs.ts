@@ -2,7 +2,7 @@ import {Configuration} from './../src/impl/';
 import {expect} from 'chai';
 import * as path from 'path';
 import * as fs from 'fs-extra';
-import {FunctionLoadTesterSpecs} from './FunctionLoadTester.specs';
+import {FunctionLoadTester} from '@frenchex/function-load-perf-tester-lib'
 
 describe('Configuration', function () {
     it('can be instantiated', async function (done) {
@@ -41,7 +41,7 @@ describe('Configuration', function () {
     });
 
     it('is performant construction with $', async function () {
-        const tester = new FunctionLoadTesterSpecs();
+        const tester = new FunctionLoadTester();
 
         (await tester
             .measureAverage(async () => {
@@ -61,7 +61,7 @@ describe('Configuration', function () {
     });
 
     it('is performant construction with $ and get simple and interpolated ones', async function () {
-        const tester = new FunctionLoadTesterSpecs();
+        const tester = new FunctionLoadTester();
 
         const c = new Configuration({
             $: {
@@ -95,7 +95,7 @@ describe('Configuration', function () {
     }
 
     it('is performant construction', async function () {
-        const tester = new FunctionLoadTesterSpecs();
+        const tester = new FunctionLoadTester();
 
         (await tester
             .measureAverage(async () => {
@@ -110,7 +110,7 @@ describe('Configuration', function () {
 
     it('is performant set foo=bar', async function () {
 
-        const tester = new FunctionLoadTesterSpecs();
+        const tester = new FunctionLoadTester();
         const configUnderTest = new Configuration();
 
         (await tester
