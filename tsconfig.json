@@ -8,7 +8,7 @@
     "lib": [
       "es2020"
     ],
-    "module": "commonjs",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "newLine": "LF",
     "preserveConstEnums": true,
@@ -22,10 +22,11 @@
       "./node_modules/@types",
       "./src/"
     ],
-    "watch": false
+    "watch": false,
+    "outDir": "dist"
   },
   "include": [
-    "./src/**/*",
-    "test/**/*.specs.*"
+    "./src/**/*.ts",
+    "test/**/*.specs.*.ts"
   ]
 }

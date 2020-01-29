@@ -1,8 +1,10 @@
-import "mocha"
+import * as mocha from "mocha"
 import {Configuration} from "./../src/impl/"
 import {expect} from 'chai'
 import * as path from "path"
 import * as fs from "fs-extra"
+
+export const MAKE_IT_A_MODULE = {};
 
 describe('Configuration', function () {
     it('can be instantiated', async function (done) {
