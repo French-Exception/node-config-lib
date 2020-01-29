@@ -22,7 +22,9 @@
     "nyc": "^15.0.0",
     "source-map-support": "^0.5.16",
     "ts-node": "^8.6.1",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   },
   "engines": {
     "node": ">= 12.14",
@@ -45,7 +47,8 @@
     "test:watch": "nodemon",
     "build": "tsc",
     "dev": "tsc -w",
-    "cover": "nyc mocha -r ts-node/register -r source-map-support/register src/test/**/*.js"
+    "cover": "nyc mocha -r ts-node/register -r source-map-support/register src/test/**/*.js",
+    "perf": "tsc && time npm run test"
   },
   "types": "dist/index.d.ts",
   "typings": "dist/index.d.ts",
