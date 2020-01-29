@@ -5,27 +5,34 @@ import * as fs from "fs-extra"
 
 export const MAKE_IT_A_MODULE = {};
 
+const unit_call = async (expect) => {
+    const c = new Configuration({
+        $: {
+            foo: {
+                bar: 'foobar',
+                foobar: '%foo.bar%%foo.bar%'
+            }
+        }
+    });
+
+    const foobar = await c.get<string>('foo.bar');
+    expect(foobar).to.be.equal('foobar');
+
+    const foobar2 = await c.get<string>('foo.foobar');
+    expect(foobar2).to.be.equal('foobarfoobar');
+
+    const foo = await c.get<object>('foo');
+    expect(foo).to.be.deep.equal({bar: 'foobar', foobar: 'foobarfoobar'});
+}
+
+
 describe('Configuration', function () {
     it('can be instantiated', async function (done) {
-        const c = new Configuration({
-            $: {
-                foo: {
-                    bar: 'foobar',
-                    foobar: '%foo.bar%%foo.bar%'
-                }
-            }
-        })
 
-        const foobar = await c.get<string>('foo.bar')
-        const foobar2 = await c.get<string>('foo.foobar')
-        const foo = await c.get<object>('foo')
+        await unit_call(expect)
 
-        expect(foobar).to.be.equal('foobar')
-        expect(foobar2).to.be.equal('foobarfoobar')
-        expect(foo).to.be.deep.equal({bar: 'foobar', foobar: 'foobarfoobar'})
+        this.test.callback();
 
-
-        this.test.callback()
     })
 
     it('can set and get', async function () {
@@ -35,6 +42,7 @@ describe('Configuration', function () {
         const foofoobar = await c.get<object>('foo.foo.bar', 'not found')
 
         expect(foofoobar).to.be.deep.equal({foo: 'bar'})
+
     })
 
     it('can save changes', async function () {
@@ -53,5 +61,12 @@ describe('Configuration', function () {
         expect(loaded).to.be.deep.equal({$: {foo: {bar: 'foobar'}}, ns: '', imports: []})
 
         await fs.remove(savedTo)
+
+    })
+
+    it('is performant', async function () {
+
+        for (let i = 0, j = 100; i < j; i++)
+            await unit_call(expect);
     })
 })
