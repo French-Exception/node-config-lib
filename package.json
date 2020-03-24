@@ -54,5 +54,5 @@
     "perf": "(npm run test | gnomon --type elapsed-total --real-time=false)"
   },
   "types": "dist/index.d.ts",
-  "version": "0.1.15"
+  "version": "0.1.16"
 }
