@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/%40frenchex%2Fconfig-lib.svg)](https://badge.fury.io/js/%40frenchex%2Fconfig-lib)
+
 # About
 
 Configuration Library is inspired by ```service-container2``` and ```Symfony Dependency Injection Container```
