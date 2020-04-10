@@ -4,7 +4,7 @@
     "deepmerge": "^4.2.2",
     "fs-extra": "^8.1.0",
     "maybe.ts": "^0.1.0",
-    "mkdirp": "^0.5.4",
+    "mkdirp": "^1.0.3",
     "object-walker": "0.0.4"
   },
   "description": "Flexible Configuration Library based on .json or .js files (raw JSON or promises)",
