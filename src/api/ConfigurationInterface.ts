@@ -4,6 +4,8 @@ export interface ConfigurationInterface {
 
     get<T>(interpolableKey: string, defaultIfUndef?: any): Promise<Maybe.Maybe<T>>
 
+    getRaw<T>(interpolableKey:string):Promise<Maybe.Maybe<T>>
+
     set(interpolableKey: string, value: any): Promise<ConfigurationInterface>
 
     merge(source: object): Promise<ConfigurationInterface>

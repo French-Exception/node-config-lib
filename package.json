@@ -1,7 +1,6 @@
 {
   "author": "Stéphane Erard <serard06@protonmail.com>",
   "dependencies": {
-    "@testdeck/mocha": "^0.1.2",
     "deepmerge": "^4.2.2",
     "fs-extra": "^8.1.0",
     "maybe.ts": "^0.1.0",
@@ -10,6 +9,7 @@
   },
   "description": "Flexible Configuration Library based on .json or .js files (raw JSON or promises)",
   "devDependencies": {
+    "@testdeck/mocha": "^0.1.2",
     "@frenchex/function-load-perf-tester-lib": "0.0.1",
     "@types/chai": "^4.2.11",
     "@types/deepmerge": "^2.2.0",

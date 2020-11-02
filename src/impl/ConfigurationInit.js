@@ -36,59 +36,40 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("mocha");
-var chai_1 = require("chai");
-var src_1 = require("../src");
+exports.ConfigurationInit = void 0;
 var path = require("path");
-describe('ConfigurationLoader', function () {
-    it('can be loaded', function (done) {
+var mkdirp = require("mkdirp");
+var fs = require("fs-extra");
+var Configuration_1 = require("./Configuration");
+var ConfigurationInit = /** @class */ (function () {
+    function ConfigurationInit() {
+    }
+    ConfigurationInit.prototype.init = function (configFile) {
         return __awaiter(this, void 0, void 0, function () {
-            var config, foobar, foobar2, foo, promise;
-            var _this = this;
+            var $, $str;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, (function () { return __awaiter(_this, void 0, void 0, function () {
-                            var loader, requestBuilder, request;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        loader = new src_1.ConfigurationLoader();
-                                        requestBuilder = new src_1.ConfigurationLoaderFromFileRequestBuilder();
-                                        requestBuilder
-                                            .withFile(path.normalize(path.join(__dirname, '..', 'test-res', 'js.js')))
-                                            .withRoot(path.normalize(path.join(__dirname, '..', 'test-res')))
-                                            .withEnv({ env: 'dev' });
-                                        return [4 /*yield*/, requestBuilder.build()];
-                                    case 1:
-                                        request = _a.sent();
-                                        return [4 /*yield*/, loader.fromFile(request)];
-                                    case 2: return [2 /*return*/, _a.sent()];
-                                }
-                            });
-                        }); })()];
+                    case 0:
+                        $ = {
+                            imports: [],
+                            ns: null,
+                            $: {
+                                "version": Configuration_1.VERSION
+                            }
+                        };
+                        return [4 /*yield*/, mkdirp(path.dirname(configFile))];
                     case 1:
-                        config = _a.sent();
-                        return [4 /*yield*/, config.get('foo.bar')];
+                        _a.sent();
+                        $str = JSON.stringify($, null, 2);
+                        return [4 /*yield*/, fs.writeFile(configFile, $str)];
                     case 2:
-                        foobar = _a.sent();
-                        return [4 /*yield*/, config.get('foo.foobar')];
-                    case 3:
-                        foobar2 = _a.sent();
-                        return [4 /*yield*/, config.get('foo')];
-                    case 4:
-                        foo = _a.sent();
-                        return [4 /*yield*/, config.get('promise')];
-                    case 5:
-                        promise = _a.sent();
-                        chai_1.expect(foobar).to.be.equal('foobar');
-                        chai_1.expect(foobar2).to.be.equal('foobarfoobar');
-                        chai_1.expect(foo).to.be.deep.equal({ bar: 'foobar', foobar: 'foobarfoobar' });
-                        chai_1.expect(promise).to.be.deep.equal('resolved');
-                        this.test.callback();
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });
         });
-    });
-});
-//# sourceMappingURL=ConfigurationLoader.specs.js.map
+    };
+    return ConfigurationInit;
+}());
+exports.ConfigurationInit = ConfigurationInit;
+//# sourceMappingURL=ConfigurationInit.js.map

@@ -23,6 +23,7 @@ export declare class Configuration implements ConfigurationInterface {
     constructor(args?: ConfigurationConstructionArgumentsInterface);
     merge(source: object): Promise<ConfigurationInterface>;
     get<T>(interpolableKey: string, defaultIfUndef?: any): Promise<Maybe.Maybe<T>>;
+    getRaw<T>(interpolableKey: string): Promise<Maybe.Maybe<T>>;
     /**
      * Returs raw, not interpolated values
      * Can include %% parameters to be resolved

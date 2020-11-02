@@ -27,6 +27,11 @@ class Configuration {
         const _interpolatedValue = await this.interpolateValue(_rawValue);
         return Maybe.or(_interpolatedValue, defaultIfUndef);
     }
+    async getRaw(interpolableKey) {
+        const _interpolatedKey = await this.interpolateString(interpolableKey);
+        const _raw = await this._get(_interpolatedKey);
+        return _raw;
+    }
     /**
      * Returs raw, not interpolated values
      * Can include %% parameters to be resolved

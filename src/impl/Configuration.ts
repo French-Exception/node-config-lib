@@ -59,6 +59,14 @@ export class Configuration implements ConfigurationInterface {
         return Maybe.or<T>(_interpolatedValue, defaultIfUndef);
     }
 
+    public async getRaw<T>(interpolableKey: string): Promise<Maybe.Maybe<T>> {
+        const _interpolatedKey = await this.interpolateString<string>(interpolableKey);
+
+        const _raw = await this._get<T>(<string>_interpolatedKey);
+
+        return _raw;
+    }
+
     /**
      * Returs raw, not interpolated values
      * Can include %% parameters to be resolved
