@@ -1,6 +1,7 @@
 {
   "author": "Stéphane Erard <serard06@protonmail.com>",
   "dependencies": {
+    "@testdeck/mocha": "^0.1.2",
     "deepmerge": "^4.2.2",
     "fs-extra": "^8.1.0",
     "maybe.ts": "^0.1.0",
@@ -20,7 +21,6 @@
     "chai": "^4.2.0",
     "gnomon": "^1.5.0",
     "mocha": "^7.1.1",
-    "mocha-typescript": "^1.1.17",
     "nodemon": "^2.0.2",
     "nyc": "^15.0.1",
     "source-map-support": "^0.5.16",
@@ -54,5 +54,5 @@
     "perf": "(npm run test | gnomon --type elapsed-total --real-time=false)"
   },
   "types": "dist/index.d.ts",
-  "version": "0.2.0"
+  "version": "0.2.1"
 }
