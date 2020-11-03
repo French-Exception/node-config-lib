@@ -40,19 +40,22 @@
   ],
   "license": "ISC",
   "main": "dist/index.js",
-  "name": "@frenchex/config-lib.ts",
+  "name": "@frenchex/config-lib",
   "publishConfig": {
     "access": "public"
   },
   "repository": "git@github.com:French-Exception/node-config-lib.git",
   "scripts": {
-    "test": "mocha -r ts-node/register -r source-map-support/register test/**/*.specs.ts",
-    "test:watch": "nodemon",
+    "configure": "frenchex-config init",
+    "watch": "tsc -w",
     "build": "tsc",
-    "dev": "tsc -w",
-    "cover": "nyc mocha -r ts-node/register -r source-map-support/register src/test/**/*.js",
-    "perf": "(npm run test | gnomon --type elapsed-total --real-time=false)"
+    "test.unit": "mocha -r ts-node/register -r source-map-support/register test/**/*.js",
+    "cover": "nyc mocha -r ts-node/register -r source-map-support/register test/**/*.js",
+    "bump.patch": "release-it patch --ci",
+    "bump.minor": "release-it minor --ci",
+    "bump.major": "release-it major --ci",
+    "release": "npm publish"
   },
   "types": "dist/index.d.ts",
-  "version": "0.2.2"
+  "version": "0.3.1"
 }

@@ -286,14 +286,14 @@ var Configuration = /** @class */ (function () {
                                             firstLevelObjects = _a.sent();
                                             p = Object.keys(firstLevelObjects).map(function (key) { return __awaiter(_this, void 0, void 0, function () {
                                                 var interpolatedKey, value, _a, _b;
-                                                return __generator(this, function (_c) {
-                                                    switch (_c.label) {
+                                                return __generator(this, function (_d) {
+                                                    switch (_d.label) {
                                                         case 0: return [4 /*yield*/, this.interpolateString(key)];
                                                         case 1:
-                                                            interpolatedKey = _c.sent();
+                                                            interpolatedKey = _d.sent();
                                                             return [4 /*yield*/, this._get(interpolatedKey)];
                                                         case 2:
-                                                            value = _c.sent();
+                                                            value = _d.sent();
                                                             if (!raw) return [3 /*break*/, 3];
                                                             object[interpolatedKey] = value;
                                                             return [3 /*break*/, 5];
@@ -302,8 +302,8 @@ var Configuration = /** @class */ (function () {
                                                             _b = interpolatedKey;
                                                             return [4 /*yield*/, this.interpolateValue(value)];
                                                         case 4:
-                                                            _a[_b] = _c.sent();
-                                                            _c.label = 5;
+                                                            _a[_b] = _d.sent();
+                                                            _d.label = 5;
                                                         case 5: return [2 /*return*/];
                                                     }
                                                 });
