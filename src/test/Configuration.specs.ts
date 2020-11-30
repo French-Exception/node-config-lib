@@ -1,4 +1,4 @@
-import {Configuration} from './../src/impl/';
+import {Configuration} from './../impl/';
 import {expect} from 'chai';
 import * as path from 'path';
 import * as fs from 'fs-extra';
@@ -13,11 +13,11 @@ describe('Configuration', function () {
 
     it('can set and get', async function () {
         const c = new Configuration();
-        await c.set('foo.foo.bar', {foo: 'bar'});
+        await c.set('foo.foo.bar', {foo: 'bar', instance: 1});
 
         const foofoobar = await c.get<object>('foo.foo.bar', 'not found');
 
-        expect(foofoobar).to.be.deep.equal({foo: 'bar'});
+        expect(foofoobar).to.be.equal({foo: 'bar', instance: 1});
 
     })
 
@@ -26,7 +26,7 @@ describe('Configuration', function () {
 
         await c.set('foo', {bar: 'foobar'});
 
-        const to = path.join(path.dirname(__dirname), 'test-res', '__test_%env%.json');
+        const to = path.join(path.dirname(__dirname), '..', 'test-res', '__test_%env%.json');
 
         const savedTo = await c.save(to);
 

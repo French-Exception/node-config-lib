@@ -1,8 +1,11 @@
 {
   "imports": [],
-  "ns": null,
+  "ns": "",
   "$": {
     "foo": "bar",
-    "foobar": "%foo%%foo%"
+    "foobar": "%foo%%foo%",
+    "_": {
+      "instance": 1
+    }
   }
 }

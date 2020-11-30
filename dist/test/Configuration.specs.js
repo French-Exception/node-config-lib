@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const impl_1 = require("./../src/impl/");
+const impl_1 = require("./../impl/");
 const chai_1 = require("chai");
 const path = require("path");
 const fs = require("fs-extra");
@@ -12,14 +12,14 @@ describe('Configuration', function () {
     });
     it('can set and get', async function () {
         const c = new impl_1.Configuration();
-        await c.set('foo.foo.bar', { foo: 'bar' });
+        await c.set('foo.foo.bar', { foo: 'bar', instance: 1 });
         const foofoobar = await c.get('foo.foo.bar', 'not found');
-        chai_1.expect(foofoobar).to.be.deep.equal({ foo: 'bar' });
+        chai_1.expect(foofoobar).to.be.equal({ foo: 'bar', instance: 1 });
     });
     it('can save changes', async function () {
         const c = new impl_1.Configuration({ env: { env: 'dev' } });
         await c.set('foo', { bar: 'foobar' });
-        const to = path.join(path.dirname(__dirname), 'test-res', '__test_%env%.json');
+        const to = path.join(path.dirname(__dirname), '..', 'test-res', '__test_%env%.json');
         const savedTo = await c.save(to);
         const jsonSaved = await fs.readFile(savedTo);
         const loaded = JSON.parse(jsonSaved.toString());

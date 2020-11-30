@@ -1,6 +1,6 @@
 import "mocha"
 import {expect} from "chai"
-import {ConfigurationLoader, ConfigurationLoaderFromFileRequestBuilder} from "../src"
+import {ConfigurationLoader, ConfigurationLoaderFromFileRequestBuilder} from "../"
 import * as path from "path"
 import * as Maybe from "maybe.ts"
 
@@ -12,8 +12,8 @@ describe('ConfigurationLoader', function () {
             const requestBuilder = new ConfigurationLoaderFromFileRequestBuilder()
 
             requestBuilder
-                .withFile(path.normalize(path.join(__dirname, '..', 'test-res', 'js.js')))
-                .withRoot(path.normalize(path.join(__dirname, '..', 'test-res')))
+                .withFile(path.normalize(path.join(__dirname, '../..', 'test-res', 'js.js')))
+                .withRoot(path.normalize(path.join(__dirname, '../..', 'test-res')))
                 .withEnv({env: 'dev'})
 
             const request = await requestBuilder.build()

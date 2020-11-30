@@ -2,16 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("mocha");
 const chai_1 = require("chai");
-const src_1 = require("../src");
+const __1 = require("../");
 const path = require("path");
 describe('ConfigurationLoader', function () {
     it('can be loaded', async function (done) {
         const config = await (async () => {
-            const loader = new src_1.ConfigurationLoader();
-            const requestBuilder = new src_1.ConfigurationLoaderFromFileRequestBuilder();
+            const loader = new __1.ConfigurationLoader();
+            const requestBuilder = new __1.ConfigurationLoaderFromFileRequestBuilder();
             requestBuilder
-                .withFile(path.normalize(path.join(__dirname, '..', 'test-res', 'js.js')))
-                .withRoot(path.normalize(path.join(__dirname, '..', 'test-res')))
+                .withFile(path.normalize(path.join(__dirname, '../..', 'test-res', 'js.js')))
+                .withRoot(path.normalize(path.join(__dirname, '../..', 'test-res')))
                 .withEnv({ env: 'dev' });
             const request = await requestBuilder.build();
             return await loader.fromFile(request);

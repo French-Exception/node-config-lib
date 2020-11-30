@@ -167,7 +167,7 @@ class Configuration {
             return _interpolatedValue;
         }
         else {
-            throw new Error('lol');
+            return _rawValue;
         }
     }
     /**
@@ -227,6 +227,9 @@ class Configuration {
             else if ('object' === typeof _value || Array.isArray(_value)) {
                 const _interpolatedValue = await this.interpolateObject(_value);
                 await _c.set(_key, _interpolatedValue);
+            }
+            else {
+                await _c.set(_key, _value);
             }
         }
         return await _c.getObject();

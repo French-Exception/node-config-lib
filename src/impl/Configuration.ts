@@ -225,8 +225,8 @@ export class Configuration implements ConfigurationInterface {
             const _interpolatedValue: T = await this.interpolateObject<T>((<any>_rawValue));
             return _interpolatedValue;
         } else {
-            throw new Error('lol');
-        }
+            return _rawValue;
+        } 
     }
 
     /**
@@ -294,6 +294,8 @@ export class Configuration implements ConfigurationInterface {
             } else if ('object' === typeof _value || Array.isArray(_value)) {
                 const _interpolatedValue = await this.interpolateObject(_value);
                 await _c.set(_key, _interpolatedValue);
+            } else {
+                await _c.set(_key, _value);
             }
         }
 
