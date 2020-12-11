@@ -13,12 +13,12 @@ describe('Configuration', function () {
 
     it('can set and get', async function () {
         const c = new Configuration();
-        await c.set('foo.foo.bar', {foo: 'bar', instance: 1});
+        const _object = {foo: 'bar', instance: 1};
+        await c.set('foo.foo.bar', _object);
 
         const foofoobar = await c.get<object>('foo.foo.bar', 'not found');
 
-        expect(foofoobar).to.be.equal({foo: 'bar', instance: 1});
-
+        expect(foofoobar).to.be.deep.equal(_object);
     })
 
     it('can save changes', async function () {

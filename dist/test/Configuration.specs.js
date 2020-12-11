@@ -12,9 +12,10 @@ describe('Configuration', function () {
     });
     it('can set and get', async function () {
         const c = new impl_1.Configuration();
-        await c.set('foo.foo.bar', { foo: 'bar', instance: 1 });
+        const _object = { foo: 'bar', instance: 1 };
+        await c.set('foo.foo.bar', _object);
         const foofoobar = await c.get('foo.foo.bar', 'not found');
-        chai_1.expect(foofoobar).to.be.equal({ foo: 'bar', instance: 1 });
+        chai_1.expect(foofoobar).to.be.deep.equal(_object);
     });
     it('can save changes', async function () {
         const c = new impl_1.Configuration({ env: { env: 'dev' } });
